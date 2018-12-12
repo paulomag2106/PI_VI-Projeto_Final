@@ -1,2 +1,2 @@
-# PI-VI---ADO-3
-2D simulation using stochastic variables
+# PI-VI---Final Project
+3D simulation using stochastic variables
