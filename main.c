@@ -9,7 +9,7 @@ int main() {
     xOffset = yOffset = 0.f;
     zoom = WIDTH/10 + 50;
     v3 camerapos = {0,0,zoom};
-    
+
     double timepassed = 0.f;
     bool isPaused = true;
     double tickToPassTime = 1.f;
@@ -93,21 +93,21 @@ int main() {
     glfwSetCursorPosCallback(window, (void *)cursor_position_callback);
     glfwSetScrollCallback(window, (void *)scroll_callback);
 
-    
+
     uint32_t twidth = TWIDTH;
     objtexture tex;
     tex.buffer = (uint32_t *) malloc(sizeof(uint32_t)*twidth*twidth);
     tex.width = twidth;
     tex.height = twidth;
     tex.bufferSize = twidth * twidth;
-    
+
     genVoronoiMap(tex.buffer, 1);
-    
+
     // Create Map
     object map = makeShapeObject(RECT, (v3){WIDTH/20, WIDTH/20, 0.f}, (v3){1.f,1.f,1.f}, NULL,
                                  GL_STATIC_DRAW, 0);
     updateTexture(&map, &tex);
-    
+
     createInitialEnvironment();
 
     //////////////////////////////////////////////////////////////////////////////
@@ -116,21 +116,21 @@ int main() {
 
     while(!glfwGetKey(window, GLFW_KEY_ESCAPE) &&
     !glfwWindowShouldClose(window)) {
-        
+
         glfwGetWindowSize(window, &width, &height);
         glViewport(0,0, 2*width, 2*height);
-        
+
         if(key_pressed[0]) {
             key_pressed[0] = false;
             timepassed = 0.f;
             isPaused = !isPaused;
         }
-        
+
         if(key_pressed[1]) {
             key_pressed[1] = false;
             tickToPassTime = clamp(tickToPassTime - 0.25f, 0.01f, 3.f);
         }
-        
+
         if(key_pressed[2]) {
             key_pressed[2] = false;
             tickToPassTime = clamp(tickToPassTime + 0.25f, 0.01f, 3.f);
@@ -140,18 +140,18 @@ int main() {
         double currentTime = glfwGetTime();
         deltaTime = currentTime - lastTime;
         lastTime = currentTime;
-        
+
         if(!isPaused) {
             timepassed += deltaTime;
-            
+
             if(timepassed > tickToPassTime) {
-                
+
                 timepassed = 0.f;
                 timePasses();
-                
+
             }
         }
-        
+
         // Zoom View Matrix
         camerapos.x += xOffset;
         camerapos.y += yOffset;
@@ -166,7 +166,7 @@ int main() {
 
         // Draw Objects
         drawObject(&map);
-        drawSites();
+        // drawSites();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
