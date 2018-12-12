@@ -101,7 +101,8 @@ int main() {
     tex.height = twidth;
     tex.bufferSize = twidth * twidth;
 
-    genVoronoiMap(tex.buffer, 1);
+    genVoronoiMap(tex.buffer, 0.75);
+    printSitePoints();
 
     // Create Map
     object map = makeShapeObject(RECT, (v3){WIDTH/20, WIDTH/20, 0.f}, (v3){1.f,1.f,1.f}, NULL,
@@ -177,6 +178,9 @@ int main() {
 
     // Free objects
     freeObject(&map);
+    for(int i = 0; i < NUMPOINTS; ++i) {
+        free(siteMeshes[i].perimeter);
+    }
     freeSites();
 
     // Free textobjects

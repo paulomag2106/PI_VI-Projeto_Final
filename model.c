@@ -2,7 +2,6 @@
 
 Site sites[NUMPOINTS];
 
-
 void setNearest(int site_index) {
 
 
@@ -33,7 +32,7 @@ void setNearest(int site_index) {
         }
     }
 
-    printf("Site %d with nearests: %d %d %d %d %d %d %d %d\n", site_index, sites[site_index].nearest[0], sites[site_index].nearest[1], sites[site_index].nearest[2], sites[site_index].nearest[3], sites[site_index].nearest[4], sites[site_index].nearest[5], sites[site_index].nearest[6], sites[site_index].nearest[7]);
+    // printf("Site %d with nearests: %d %d %d %d %d %d %d %d\n", site_index, sites[site_index].nearest[0], sites[site_index].nearest[1], sites[site_index].nearest[2], sites[site_index].nearest[3], sites[site_index].nearest[4], sites[site_index].nearest[5], sites[site_index].nearest[6], sites[site_index].nearest[7]);
 
 }
 
@@ -77,7 +76,7 @@ void createInitialEnvironment() {
 
 void timePasses() {
 
-    printf("time has passed!\n");
+    // printf("time has passed!\n");
 
     for(int i = 0; i < NUMPOINTS; i++) {
 

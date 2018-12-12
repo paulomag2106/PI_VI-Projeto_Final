@@ -1,12 +1,21 @@
 #pragma once
 #include "functions.h"
-#define TWIDTH 1024
-#define RADIUS 128
+#define TWIDTH (1024/2)
+#define RADIUS (128/2)
+#define VORONOIPOINTS RADIUS*4
 #define NUMPOINTS (TWIDTH/RADIUS * TWIDTH/RADIUS)
 
-v3 points[NUMPOINTS];
-v3 voronoiPoints[NUMPOINTS*NUMPOINTS];
+typedef struct t_siteObj {
+    int numPoints;
+    v3 center;
+    v3 *perimeter;
+}siteObj;
 
+v3 points[NUMPOINTS];
+siteObj siteMeshes[NUMPOINTS];
+v3 voronoiPoints[VORONOIPOINTS];
+
+void printSitePoints();
 float getD(v3 a, v3 b, v3 c);
 float getU(v3 a, v3 b);
 float getV(v3 b, v3 c);
