@@ -170,14 +170,14 @@ int main() {
     glfwSetScrollCallback(window, (void *)scroll_callback);
 
 
-    uint32_t twidth = TWIDTH;
-    objtexture tex;
-    tex.buffer = (uint32_t *) malloc(sizeof(uint32_t)*twidth*twidth);
-    tex.width = twidth;
-    tex.height = twidth;
-    tex.bufferSize = twidth * twidth;
+    // uint32_t twidth = TWIDTH;
+    // objtexture tex;
+    // tex.buffer = (uint32_t *) malloc(sizeof(uint32_t)*twidth*twidth);
+    // tex.width = twidth;
+    // tex.height = twidth;
+    // tex.bufferSize = twidth * twidth;
 
-    genVoronoiMap(tex.buffer, 1);
+    genVoronoiMap(1);
     // printSitePoints();
 
     // Create Map
@@ -267,7 +267,7 @@ int main() {
     for(int i = 0; i < NUMPOINTS; ++i) {
         free(siteMeshes[i].perimeter);
     }
-    freeSites();
+    // freeSites();
 
     // Free textobjects
 

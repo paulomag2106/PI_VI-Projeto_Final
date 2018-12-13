@@ -48,7 +48,7 @@ bool isInCircle(v3 point, v3 center, float radius) {
 		center.z - point.z
 	};
     float pointDist = dist(vec);
-    return pointDist <= radius;
+    return pointDist < (radius-0.1f);
 
 }
 
@@ -151,7 +151,7 @@ void makeVoronoiVerts() {
 
 }
 
-void genVoronoiMap(uint32_t *tex, float variation) {
+void genVoronoiMap(float variation) {
 
 	for(int i = 0; i < TWIDTH/RADIUS; ++i) {
 		for(int j = 0; j < TWIDTH/RADIUS; ++j) {
