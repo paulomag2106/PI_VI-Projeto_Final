@@ -1,8 +1,8 @@
 #pragma once
 #include "functions.h"
 #define TWIDTH (1024/2)
-#define RADIUS (512/4)
-#define VORONOIPOINTS RADIUS*16
+#define RADIUS (512/8)
+// #define VORONOIPOINTS RADIUS*16
 #define NUMPOINTS (TWIDTH/RADIUS * TWIDTH/RADIUS)
 #define NUMSITES (((TWIDTH/RADIUS)-2) * ((TWIDTH/RADIUS)-2))
 #define INVALID (v3){-TWIDTH*5,-TWIDTH*5,-TWIDTH*5}
@@ -16,7 +16,7 @@ typedef struct t_siteObj {
 v3 points[NUMPOINTS];
 // siteObj siteMeshes[NUMSITES];
 siteObj siteMeshes[NUMPOINTS];
-v3 voronoiPoints[VORONOIPOINTS];
+// v3 voronoiPoints[VORONOIPOINTS];
 
 void printSitePoints(void);
 float getD(v3 a, v3 b, v3 c);

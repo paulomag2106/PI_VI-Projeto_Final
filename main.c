@@ -7,73 +7,73 @@ int objectsCount = 0;
 object *objectArray;
 
 void createTerrain() {
-    
+
     int size = sqrt(NUMPOINTS);
     int newSize = size - 2;
-    
+
     siteObj sitesArray[newSize * newSize];
     objectArray = malloc(sizeof(object));
-    
+
     for(int x = 1; x < (size-1); x++) {
-        
+
         for(int y = 1; y < (size-1); y++) {
-            
+
             sitesArray[(x-1) + ((y-1) * newSize)] = siteMeshes[x + (y * size)];
-            
+
         }
     }
-    
+
     for(int x = 0; x < newSize; x++) {
-        
+
         for(int y = 0; y < newSize; y++) {
-            
+
             siteObj site = sitesArray[x + (y * newSize)];
-            
+
             for(int p = 0; p < site.numPoints; p++) {
-                
+
                 objectsCount++;
-                
+
                 v3 a,b,c;
-                
+
                 a = site.perimeter[p];
                 c = site.center;
-                
+
                 c.x -= (TWIDTH/2.f);
                 c.y -= (TWIDTH/2.f);
                 c.z = 0.f;
-                
+
                 if(p+1 >= site.numPoints) b = site.perimeter[0];
                 else b = site.perimeter[p+1];
-                
+
                 a.x = c.x + a.x;
                 a.y = c.y + a.y;
-                
+
                 b.x = c.x + b.x;
                 b.y = c.y + b.y;
-                
+
                 float red = randRange(0, 100) / 100.f;
                 float green = randRange(0, 100) / 100.f;
                 float blue = randRange(0, 100) / 100.f;
-                
+
                 object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
-                
+
                 float accident = frand(1.f);
-                
-                makeNoisyTriangle(&newObject, a, b, c, 20, 10.f * accident);
-                
+
+                makeNoisyTriangle(&newObject, a, b, c, 10, 10.f * accident);
+
                 makeVBOSizeAndPush(&newObject);
-                
+
                 //v3 position = newV3(c.x - (TWIDTH/2.f), c.y - (TWIDTH/2.f), 0.f);
-                
+
                 //moveObjTo(&newObject, position);
-                
+
                 objectArray = realloc(objectArray, objectsCount * sizeof(object));
                 objectArray[objectsCount-1] = newObject;
-                
-                
-                
+
+
+
             }
-            
+
         }
     }
 }
@@ -187,7 +187,7 @@ int main() {
 
     createInitialEnvironment();
     createTerrain();
-    
+
 
     //////////////////////////////////////////////////////////////////////////////
     //                                MAIN LOOP                                 //
@@ -263,7 +263,7 @@ int main() {
     for(int i = 0; i < objectsCount; i++) {
         freeObject(&objectArray[i]);
     }
-    
+
     for(int i = 0; i < NUMPOINTS; ++i) {
         free(siteMeshes[i].perimeter);
     }
