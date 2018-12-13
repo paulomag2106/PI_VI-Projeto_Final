@@ -59,7 +59,7 @@ void createTerrain() {
                 
                 float accident = frand(1.f);
                 
-                makeNoisyTriangle(&newObject, a, b, c, 20, 10.f * accident);
+                makeNoisyTriangle(&newObject, a, b, c, 40, 10.f * accident);
                 
                 makeVBOSizeAndPush(&newObject);
                 

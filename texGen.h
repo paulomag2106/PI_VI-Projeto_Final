@@ -1,7 +1,7 @@
 #pragma once
 #include "functions.h"
 #define TWIDTH (1024/2)
-#define RADIUS (512/4)
+#define RADIUS (128/4)
 #define VORONOIPOINTS RADIUS*16
 #define NUMPOINTS (TWIDTH/RADIUS * TWIDTH/RADIUS)
 #define NUMSITES (((TWIDTH/RADIUS)-2) * ((TWIDTH/RADIUS)-2))
