@@ -177,8 +177,8 @@ int main() {
     tex.height = twidth;
     tex.bufferSize = twidth * twidth;
 
-    genVoronoiMap(tex.buffer, 0.75);
-    printSitePoints();
+    genVoronoiMap(tex.buffer, 1);
+    // printSitePoints();
 
     // Create Map
 //    object map = makeShapeObject(RECT, (v3){WIDTH/20, WIDTH/20, 0.f}, (v3){1.f,1.f,1.f}, NULL,
@@ -238,7 +238,7 @@ int main() {
         cameraPos = rotate(cameraPos, (v3){0,0,1}, yAngle);
         View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1}); // NOTE: camera is ALWAYS UPRIGHT!!!
 
-        printf("X:%f e Y:%f\n", xAngle, yAngle);
+        // printf("X:%f e Y:%f\n", xAngle, yAngle);
 
         // Update View Matrix
         glUniformMatrix4fv(ViewID, 1, GL_TRUE, (GLfloat *)&View);

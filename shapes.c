@@ -1,13 +1,13 @@
 #include "shapes.h"
 
 void makeVBOSizeAndPush(object *newObject) {
-    
+
     newObject->vboSize[0] = sizeof(GLfloat) * newObject->verticesCount * 3; // vertices buffer size
     newObject->vboSize[1] = sizeof(GLfloat) * newObject->verticesCount * 3; // normals buffer size
     newObject->vboSize[2] = sizeof(GLfloat) * newObject->verticesCount * 2; // uvs buffer size
-    
+
     pushObject(newObject);
-    
+
 }
 
 void fixRoundUVs(object *obj, int startIndex, int endIndex, v3 radius) {
@@ -308,139 +308,139 @@ float invertChance = 0.5f;
 bool noiseUp = true;
 
 float randomizeNoise(float noise) {
-    
+
     float randomA = frand(1.f);
-    
+
     if(randomA <= invertChance) {
         noiseUp = !noise;
         invertChance = 0.5f;
     }
-    
+
     else {
         invertChance *= 1.18f;
     }
 
-    
+
     float randomB = frand(1.f);
-    
+
     if(noiseUp) return noise * randomB;
     else return -(noise * randomB);
-    
+
 }
 
 void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivision, float noise) {
-    
+
     int triangle_layers = 1 + subdivision;
     int triangles_on_face = triangle_layers * triangle_layers;
-    
+
     bool hasLastD = false;
     v3 lastD = newV3(0, 0, 0);
-    
+
     int dIndex = 0;
     int dCount = 0;
-    
+
     float d_points[subdivision-1];
     float previous_d_points[subdivision-1];
-    
+
     v3 *verts = malloc(sizeof(v3) * triangles_on_face * 3);
     v2 *uvs = malloc(sizeof(v2) * triangles_on_face * 3);
     v3 *normals = malloc(sizeof(v3) * triangles_on_face * 3);
     v3 curr_point = pointA;
     v3 start_point = pointA;
-    
+
     v3 dist_a = {.x = pointA.x - pointC.x, .y = pointA.y - pointC.y, .z = pointA.z - pointC.z};
     v3 dist_b = {.x = pointB.x - pointC.x, .y = pointB.y - pointC.y, .z = pointB.z - pointC.z};
-    
+
     v3 face_normal = crossProduct(dist_a, dist_b);
-    
+
     float normalize = dist(face_normal);
     face_normal.x = face_normal.x / normalize;
     face_normal.y = face_normal.y / normalize;
     face_normal.z = face_normal.z / normalize;
-    
+
     int index = 0;
-    
+
     float change_y_x = (pointC.x - pointA.x) / (float) triangle_layers;
     float change_y_y = (pointC.y - pointA.y) / (float) triangle_layers;
     float change_y_z = (pointC.z - pointA.z) / (float) triangle_layers;
-    
+
     float change_x_x = (pointB.x - pointA.x) / (float) triangle_layers;
     float change_x_y = (pointB.y - pointA.y) / (float) triangle_layers;
     float change_x_z = (pointB.z - pointA.z) / (float) triangle_layers;
-    
+
     int base_points = triangle_layers + 1;
-    
+
     for(int l = triangle_layers; l > 0; l--) {
-        
+
         curr_point = start_point;
-        
+
         int num_points = l + 1;
         int num_triangles = (2 * num_points) - 3;
         int point_number = 0;
         float plus = abs(l - triangle_layers) / 2.f;
-        
+
         dIndex = 0;
         dCount = 0;
-        
+
         for(int i = 0; i < (subdivision-1); i++) {
             previous_d_points[i] = d_points[i];
             d_points[i] = 0.f;
-            
-            printf("%f\n", previous_d_points[i]);
+
+            // printf("%f\n", previous_d_points[i]);
         }
-        
+
         for(int t = num_triangles; t > 0; t-= 2) {
-            
+
             v3 a = curr_point;
             v3 b = { .x = a.x + change_x_x, .y = a.y + change_x_y, .z = a.z + change_x_z };
             v3 c = { .x = a.x + change_y_x, .y = a.y + change_y_y, .z = a.z + change_y_z };
-            
+
             v3 safeB = b;
-            
+
             if(l < triangle_layers) {
-                
+
                 if(t < num_triangles) {
                     a.z = previous_d_points[dIndex-1];
                 }
-                
+
                 if((t-2) > 0) {
                     b.z = previous_d_points[dIndex];
                     dIndex++;
                 }
-                
-                
+
+
             }
-            
+
             if(hasLastD) {
                 hasLastD = false;
-                
+
                 if((t-2) > 0) c = lastD;
             }
-            
+
             verts[index] = a;
             verts[index + 1] = b;
             verts[index + 2] = c;
-            
+
             v3 dist_a = {.x = a.x - c.x, .y = a.y - c.y, .z = a.z - c.z};
             v3 dist_b = {.x = b.x - c.x, .y = b.y - c.y, .z = b.z - c.z};
-            
+
             v3 face_normal = crossProduct(dist_a, dist_b);
-            
+
             float normalize = dist(face_normal);
             face_normal.x = face_normal.x / normalize;
             face_normal.y = face_normal.y / normalize;
             face_normal.z = face_normal.z / normalize;
-            
+
             normals[index] = face_normal;
             normals[index + 1] = face_normal;
             normals[index + 2] = face_normal;
-            
+
             v2 uv_a = { .x = (float)(point_number + plus) / (base_points - 1), .y = fabsf(l - (float) triangle_layers) / triangle_layers };
             v2 uv_b = { .x = (float)(point_number + plus + 1) / (base_points - 1), .y = fabsf(l - (float) triangle_layers) / triangle_layers };
             v2 uv_c = { .x = (float)(point_number + plus + 0.5) / (base_points - 1), .y = fabsf(l - 1 - (float) triangle_layers) / triangle_layers };
-            
+
             if(change_y_y < 0.f) {
-                
+
                 uv_a.x = fabsf(uv_a.x - 1.f);
                 uv_a.y = fabsf(uv_a.y - 1.f);
                 uv_b.x = fabsf(uv_b.x - 1.f);
@@ -448,102 +448,102 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
                 uv_c.x = fabsf(uv_c.x - 1.f);
                 uv_c.y = fabsf(uv_c.y - 1.f);
             }
-            
+
             uvs[index] = uv_a;
             uvs[index + 1] = uv_b;
             uvs[index + 2] = uv_c;
-            
+
             index += 3;
-            
+
             if(t > 1) {
-                
+
                 v3 d = { .x = safeB.x + change_y_x, .y = safeB.y + change_y_y, .z = safeB.z + change_y_z };
-                
+
                 //point D is not on border
                 if((t-4) > 0) {
                     d.z += randomizeNoise(noise);
-                    
+
                     hasLastD = true;
                     lastD = d;
-                    
+
                     d_points[dCount] = d.z;
                     dCount++;
                 }
-                
+
                 verts[index] = b;
                 verts[index + 1] = d;
                 verts[index + 2] = c;
-                
+
                 v3 dist_b2 = {.x = b.x - c.x, .y = b.y - c.y, .z = b.z - c.z};
                 v3 dist_d = {.x = d.x - c.x, .y = d.y - c.y, .z = d.z - c.z};
-                
+
                 v3 face_normal = crossProduct(dist_b2, dist_d);
-                
+
                 float normalize = dist(face_normal);
                 face_normal.x = face_normal.x / normalize;
                 face_normal.y = face_normal.y / normalize;
                 face_normal.z = face_normal.z / normalize;
-                
+
                 normals[index] = face_normal;
                 normals[index + 1] = face_normal;
                 normals[index + 2] = face_normal;
-                
+
                 v2 uv_d = { .x = (float)(point_number + 1.5 + plus) / (base_points - 1), .y = fabsf(l - 1 - (float) triangle_layers) / triangle_layers };
-                
+
                 if(change_y_y < 0.f) {
-                    
+
                     uv_d.x = fabsf(uv_d.x - 1.f);
                     uv_d.y = fabsf(uv_d.y - 1.f);
                 }
-                
+
                 uvs[index] = uv_b;
                 uvs[index + 1] = uv_d;
                 uvs[index + 2] = uv_c;
-                
+
                 index += 3;
             }
-            
+
             point_number++;
-            
+
             curr_point.x += change_x_x;
             curr_point.y += change_x_y;
             curr_point.z += change_x_z;
         }
-        
+
         start_point.x += change_y_x;
         start_point.y += change_y_y;
         start_point.z += change_y_z;
     }
-    
+
     int oldCount = obj->verticesCount;
-    
+
     obj->verticesCount = obj->verticesCount + (triangles_on_face * 3);
-    
+
     obj->vertices = realloc(obj->vertices, sizeof(GLfloat) * obj->verticesCount * 3);
     obj->normals = realloc(obj->normals, sizeof(GLfloat) * obj->verticesCount * 3);
     obj->uvs = realloc(obj->uvs, sizeof(GLfloat) * obj->verticesCount * 2);
-    
-    
+
+
     for(int i = oldCount; i < obj->verticesCount; i++) {
-        
+
         int x = i - oldCount;
-        
+
         obj->vertices[(i*3)] = verts[x].x;
         obj->vertices[(i*3)+1] = verts[x].y;
         obj->vertices[(i*3)+2] = verts[x].z;
-        
+
         obj->normals[(i*3)] = normals[x].x;
         obj->normals[(i*3)+1] = normals[x].y;
         obj->normals[(i*3)+2] = normals[x].z;
-        
+
         obj->uvs[(i*2)] = uvs[x].x;
         obj->uvs[(i*2)+1] = uvs[x].y;
     }
-    
+
     free(normals);
     free(verts);
     free(uvs);
-    
+
 }
 
 void makeTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivision) {
@@ -903,6 +903,6 @@ object makeShapeObject(objEnum type, v3 radius, v3 color, objtexture *texture, G
     }
 
     makeVBOSizeAndPush(&newObject);
-    
+
     return newObject;
 }
