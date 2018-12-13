@@ -71,9 +71,9 @@ void createTerrain() {
 
         }
     }
-    
+
     //for(;;)
-    
+
     //loadOBJModel("grey_wolf.obj");
 }
 
@@ -146,6 +146,7 @@ int main() {
 
     // Create and compile our GLSL program from the shaders
     programID = loadShaders("vertex.shader", "fragment.shader");
+    // programID2 = loadShaders("vertex.shader", "fragment.shader");
     glUseProgram(programID);
 
     // Perspective Projection matrix
