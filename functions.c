@@ -304,26 +304,26 @@ void cursor_position_callback(GLFWwindow* window) {
     if(!(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)) {
         leftClick = false;
     }
-    
+
     if(leftClick) {
-        
+
         double oldx = mouseX;
         double oldy = mouseY;
-        
+
         glfwGetCursorPos(window, &mouseX, &mouseY);
 //        int width, height;
 //        glfwGetWindowSize(window, &width, &height);
-        
+
         double deltax = mouseX - oldx;
         double deltay = mouseY - oldy;
-        
+
         const float speed = 1.f;
-        
+
         xAngle += speed * -deltay * deltaTime;
         yAngle += speed * -deltax * deltaTime;
-        
+
         //xAngle = clamp(xAngle, -(M_PI-0.1f)/2, (M_PI-0.1f)/2);
-        
+
 //        if(deltax > 0) {
 //            yAngle += speed * deltay * deltaTime;
 //        } else if(deltax < 0) {
@@ -336,12 +336,12 @@ void cursor_position_callback(GLFWwindow* window) {
 //            xAngle -= (float)(width/3)/(width*M_PI*2);
 //        }
 //
-//        // NOTE: Don't allow X camera angle to go OVER the -90 to 90 degrees, with
+//        // NOTE: Don't allow X camera angle to go OVER the -PI/2 to 0 degrees, with
 //        // small margin of 0.05 radians so object won't disappear from view
-//        xAngle = clamp(xAngle, -(M_PI-0.1f)/2, (M_PI-0.1f)/2);
-        
+       xAngle = clamp(xAngle, -(M_PI-0.1f)/2, -0.05f);
+
     }
-    
+
     if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         leftClick = true;
         glfwGetCursorPos(window, &mouseX, &mouseY);
