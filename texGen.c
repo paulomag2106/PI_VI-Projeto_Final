@@ -81,7 +81,8 @@ void makeVoronoiVerts() {
 				// if(a != b && a != c && b != c) {
 	                v3 center = getCircCenter(points[a], points[b], points[c]);
 
-	                if(center.x != -TWIDTH*5 && center.y != -TWIDTH*5 && center.z != -TWIDTH*5) {
+					if(center.x != INVALID.x && center.y != INVALID.y && center.z != INVALID.z) {
+	                // if(center.x != -TWIDTH*5 && center.y != -TWIDTH*5 && center.z != -TWIDTH*5) {
 
 						v3 radiusV = (v3) {
 							center.x - points[a].x,
@@ -115,8 +116,8 @@ void makeVoronoiVerts() {
 								(v3){
 									center.x - siteMeshes[a].center.x,
 									center.y - siteMeshes[a].center.y,
-									center.z - siteMeshes[a].center.z,
-									};
+									0,
+								};
 
 							siteMeshes[b].perimeter = realloc(siteMeshes[b].perimeter,
 													  		  (siteMeshes[b].numPoints+1)*
@@ -125,8 +126,8 @@ void makeVoronoiVerts() {
 								(v3){
 									center.x - siteMeshes[b].center.x,
 									center.y - siteMeshes[b].center.y,
-									center.z - siteMeshes[b].center.z,
-									};
+									0,
+								};
 
 							siteMeshes[c].perimeter = realloc(siteMeshes[c].perimeter,
 													  		  (siteMeshes[c].numPoints+1)*
@@ -135,8 +136,8 @@ void makeVoronoiVerts() {
 								(v3){
 									center.x - siteMeshes[c].center.x,
 									center.y - siteMeshes[c].center.y,
-									center.z - siteMeshes[c].center.z,
-									};
+									0,
+								};
 
 							// siteMeshes[b].perimeter = realloc(sizeof(++siteMeshes[b].numPoints)*
 							// 								  sizeof(v3));
