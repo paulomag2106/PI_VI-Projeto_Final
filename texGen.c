@@ -82,7 +82,6 @@ void makeVoronoiVerts() {
 	                v3 center = getCircCenter(points[a], points[b], points[c]);
 
 					if(center.x != INVALID.x && center.y != INVALID.y && center.z != INVALID.z) {
-	                // if(center.x != -TWIDTH*5 && center.y != -TWIDTH*5 && center.z != -TWIDTH*5) {
 
 						v3 radiusV = (v3) {
 							center.x - points[a].x,
@@ -157,13 +156,21 @@ void genVoronoiMap(uint32_t *tex, float variation) {
 	for(int i = 0; i < TWIDTH/RADIUS; ++i) {
 		for(int j = 0; j < TWIDTH/RADIUS; ++j) {
 			int index = j + i*(TWIDTH/RADIUS);
-			points[index].x = (frand(variation*RADIUS) -
-							   variation*RADIUS/4) + i*RADIUS +
-							   RADIUS/2;
-			points[index].y = (frand(variation*RADIUS) -
-							   variation*RADIUS/4) + j*RADIUS +
-							   RADIUS/2;
-			points[index].z = frand(1.f);
+
+			if(i > 0 && i < (TWIDTH/RADIUS)-1 &&
+				j > 0 && j < (TWIDTH/RADIUS)-1) {
+				points[index].x = (frand(variation*RADIUS) -
+								   variation*RADIUS/4) + i*RADIUS +
+								   RADIUS/2;
+				points[index].y = (frand(variation*RADIUS) -
+								   variation*RADIUS/4) + j*RADIUS +
+								   RADIUS/2;
+				points[index].z = frand(1.f);
+			} else {
+				points[index].x = i*RADIUS + RADIUS/2;
+				points[index].y = j*RADIUS + RADIUS/2;
+				points[index].z = 0;
+			}
 			// if(i > 0 && i < (TWIDTH/RADIUS)-1 &&
 			// 	j > 0 && j < (TWIDTH/RADIUS)-1) {
 				siteMeshes[index].center = points[index];
