@@ -77,10 +77,10 @@ GLuint loadShaders(const char *vertex_file_name, const char *fragment_file_name)
 }
 
 object loadOBJModel(const char *file_name) {
-
+    
     //Open file
     FILE *OBJFile = fopen(file_name, "r");
-
+    
     //Check success
     if(OBJFile == NULL) {
         printf("Failed to open the file %s.\n", file_name);
@@ -89,30 +89,30 @@ object loadOBJModel(const char *file_name) {
         nul.drawMode = GL_TRIANGLES;
         return nul;
     }
-
+    
     //Create arrays for vertices, normals and uv mapping
     v3 *vertex_array = malloc(sizeof(*vertex_array));
     v3 *normal_array = malloc(sizeof(*normal_array));
     v2 *uv_array = malloc(sizeof(*uv_array));
-
+    
     //Create arrays for indexes used for every face
     unsigned int *vertex_index_array = malloc(sizeof(*vertex_index_array));
     unsigned int *uv_index_array = malloc(sizeof(*uv_index_array));
     unsigned int *normal_index_array = malloc(sizeof(*normal_index_array));
-
+    
     //Count of vertices, normals, uvs, indexes, normal indexes, and lines readed.
     int v = 0, n = 0, u = 0, i = 0, line_count = 0;
-
+    
     //Size and string used for getline()
     size_t size;
     char *line = calloc(500, sizeof(char));
-
+    
     // ** Reading loop ** //
     while(1) {
-
-
+        
+        
         line_count++;
-
+        
 #if defined(_WIN32)
         if(getNextLine(line, 500, OBJFile) < 0) {
             break;
@@ -123,182 +123,182 @@ object loadOBJModel(const char *file_name) {
             break;
         }
 #endif
-
+        
         // *** Check if line starts with: "vt", "vn", "v", "f" *** //
         if(strncmp(line, "vt", strlen("vt")) == 0) {
             v2 uv;
             sscanf(line, "vt %f %f\n", &uv.x, &uv.y);
-
+            
             if(u > 0) {
                 uv_array = realloc(uv_array, (u+1) * sizeof(*uv_array));
             }
-
+            
             uv_array[u] = uv;
             u++;
-
+            
         }
-
+        
         else if(strncmp(line, "vn", strlen("vn")) == 0) {
             v3 normal;
             sscanf(line, "vn %f %f %f\n", &normal.x, &normal.y, &normal.z);
-
+            
             if(n > 0) {
                 normal_array = realloc(normal_array, (n+1) * sizeof(*normal_array));
             }
-
+            
             normal_array[n] = normal;
             n++;
         }
-
+        
         else if(strncmp(line, "v", strlen("v")) == 0) {
             v3 vertex;
-
+            
             sscanf(line, "v %f %f %f\n", &vertex.x, &vertex.y, &vertex.z);
-
+            
             if(v > 0) {
                 vertex_array = realloc(vertex_array, (v+1) * sizeof(*vertex_array));
             }
-
+            
             vertex_array[v] = vertex;
             v++;
         }
-
+        
         else if(strncmp(line, "f", strlen("f")) == 0) {
-
+            
             char *sub_line;
             unsigned int vertex_index, uv_index = 1, normal_index = 1;
-
+            
             //Split line in strings separated by " "
             sub_line = strtok(line, " ");
-
-
+            
+            
             while(sub_line != NULL) {
-
+                
                 if(sscanf(sub_line,  "%d/%d/%d", &vertex_index, &uv_index, &normal_index) == 3) {
-
+                    
                     if(i > 0) {
                         vertex_index_array = realloc(vertex_index_array, (i+1) * sizeof(*vertex_index_array));
                         uv_index_array = realloc(uv_index_array, (i+1) * sizeof(*uv_index_array));
                         normal_index_array = realloc(normal_index_array, (i+1) * sizeof(*normal_index_array));
                     }
-
+                    
                     vertex_index_array[i] = vertex_index;
                     uv_index_array[i] = uv_index;
                     normal_index_array[i] = normal_index;
-
+                    
                     i++;
-
+                    
                 }
-
+                
                 else if(sscanf(sub_line, "%d//%d", &vertex_index, &normal_index) == 2) {
-
+                    
                     if(i > 0) {
                         vertex_index_array = realloc(vertex_index_array, (i+1) * sizeof(*vertex_index_array));
                         uv_index_array = realloc(uv_index_array, (i+1) * sizeof(*uv_index_array));
                         normal_index_array = realloc(normal_index_array, (i+1) * sizeof(*normal_index_array));
                     }
-
+                    
                     vertex_index_array[i] = vertex_index;
                     uv_index_array[i] = uv_index;
                     normal_index_array[i] = normal_index;
-
+                    
                     i++;
-
+                    
                 }
-
+                
                 else if(sscanf(sub_line, "%d/%d", &vertex_index, &normal_index) == 2) {
-
+                    
                     if(i > 0) {
                         vertex_index_array = realloc(vertex_index_array, (i+1) * sizeof(*vertex_index_array));
                         uv_index_array = realloc(uv_index_array, (i+1) * sizeof(*uv_index_array));
                         normal_index_array = realloc(normal_index_array, (i+1) * sizeof(*normal_index_array));
                     }
-
+                    
                     vertex_index_array[i] = vertex_index;
                     uv_index_array[i] = uv_index;
                     normal_index_array[i] = normal_index;
-
+                    
                     i++;
-
+                    
                 }
-
+                
                 sub_line = strtok(NULL, " ");
             }
-
+            
             free(sub_line);
         }
     }
-
+    
     free(line);
-
+    
     int total = (i * 3);
-
+    
     //Arrays for drawing
     //GLfloat vertices[total], uvs[i * 2], normals[total];
-
-	GLfloat *vertices = malloc(sizeof(GLfloat) * total);
-	GLfloat *normals = malloc(sizeof(GLfloat) * total);
-	GLfloat *uvs = malloc(sizeof(GLfloat) *i * 2);
-
+    
+    GLfloat *vertices = malloc(sizeof(GLfloat) * total);
+    GLfloat *normals = malloc(sizeof(GLfloat) * total);
+    GLfloat *uvs = malloc(sizeof(GLfloat) *i * 2);
+    
     //Pass the faces informations to the arrays
     for(int x = 0; x < i; x++) {
-
+        
         int v_index = vertex_index_array[x] - 1, u_index = uv_index_array[x] - 1, n_index = normal_index_array[x] - 1;
-
-        if(v_index >= v || u_index >= u || v_index < 0 || u_index < 0 || n_index >= n || n_index < 0) {
+        
+        if(v_index >= v || (u_index >= u && u > 0) || v_index < 0 || u_index < 0 || n_index >= n || n_index < 0) {
             printf("WARNING: Some index is beyond bounds.\n");
             printf("vertex index: %d, uv index: %d, normal index: %d \n", v_index, u_index, n_index);
         }
-
+        
         else {
             vertices[(x * 3)] = vertex_array[v_index].x;
             vertices[(x * 3) + 1] = vertex_array[v_index].y;
             vertices[(x * 3) + 2] = vertex_array[v_index].z;
-
+            
             uvs[(x * 2)] = uv_array[u_index].x;
             uvs[(x * 2) + 1] = uv_array[u_index].y;
-
+            
             normals[(x * 3)] = normal_array[n_index].x;
             normals[(x * 3) + 1] = normal_array[n_index].y;
             normals[(x * 3) + 2] = normal_array[n_index].z;
         }
     }
-
-
+    
+    
     object newObject;
     newObject.usage = GL_STATIC_DRAW;
     newObject.drawMode = GL_TRIANGLES;
     newObject.tex = NULL;
-
+    
     newObject.vboSize[0] = sizeof(GLfloat) * total; // vertices buffer size
     newObject.vertices = malloc(newObject.vboSize[0]);
     memcpy(newObject.vertices, vertices, newObject.vboSize[0]);
-
+    
     newObject.vboSize[1] = sizeof(GLfloat) * total; // normals buffer size
     newObject.normals = malloc(newObject.vboSize[1]);
     memcpy(newObject.normals, normals, newObject.vboSize[1]);
-
-
+    
+    
     newObject.vboSize[2] = sizeof(GLfloat) * (i * 2); // uvs buffer size
     newObject.uvs = malloc(newObject.vboSize[2]);
     memcpy(newObject.uvs, uvs, newObject.vboSize[2]);
-
+    
     newObject.color = newV3(1.f, 1.f, 1.f);
-
+    
     free(vertex_array);
     free(normal_array);
     free(uv_array);
     free(vertex_index_array);
     free(uv_index_array);
     free(normal_index_array);
-	free(vertices);
-	free(uvs);
-	free(normals);
-
+    free(vertices);
+    free(uvs);
+    free(normals);
+    
     fclose(OBJFile);
-
+    
     pushObject(&newObject);
-
+    
     return newObject;
 }
 

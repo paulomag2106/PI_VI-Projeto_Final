@@ -51,14 +51,17 @@ void createInitialEnvironment() {
         float preyDensity = frand(1.f) * clamp(sites[i].slopeAngle, 0.4f, 0.6f);
         float wolfDensity = frand(1.f) * clamp((1.f - sites[i].slopeAngle), 0.3f, 0.8f);
 
-        object preyObj = makeShapeObject(TRIANGLE, newV3(1, 1, 0), newV3(0, 0, 1), NULL, GL_DYNAMIC_DRAW, 0);
-        object wolfObj = makeShapeObject(ELLIPSOID_2D, newV3(1, 1, 0), newV3(1, 0, 0), NULL, GL_DYNAMIC_DRAW, 2);
+        object preyObj = loadOBJModel("models/grey_wolf.obj");
+        object wolfObj = loadOBJModel("models/deer.obj");
+        
+//        object preyObj = makeShapeObject(TRIANGLE, newV3(1, 1, 0), newV3(0, 0, 1), NULL, GL_DYNAMIC_DRAW, 0);
+//        object wolfObj = makeShapeObject(ELLIPSOID_2D, newV3(1, 1, 0), newV3(1, 0, 0), NULL, GL_DYNAMIC_DRAW, 2);
 
-        preyObj.position = newV3(sites[i].x + 1.f, sites[i].y, 0.1f);
-        wolfObj.position = newV3(sites[i].x - 1.f, sites[i].y, 0.11f);
+        preyObj.position = newV3(sites[i].x + 1.f, sites[i].y, 5.1f);
+        wolfObj.position = newV3(sites[i].x - 1.f, sites[i].y, 5.11f);
 
-        scaleObjTo(&preyObj, newV3(2*preyDensity, 2*preyDensity, 0));
-        scaleObjTo(&wolfObj, newV3(2*wolfDensity, 2*wolfDensity, 0));
+        scaleObjTo(&preyObj, newV3(18.2f*preyDensity, 18.2f*preyDensity, 18.2f*preyDensity));
+        scaleObjTo(&wolfObj, newV3(12.2f*wolfDensity, 12.2f*wolfDensity, 12.2f*wolfDensity));
 
         sites[i].prey = (Prey){preyObj, preyDensity};
         sites[i].wolf = (Wolf){wolfObj, wolfDensity};

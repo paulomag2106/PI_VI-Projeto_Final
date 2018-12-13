@@ -25,7 +25,7 @@ void main() {
 
 	vec3 modelTransform = scale * vertexPosition_modelspace + pos;
 	gl_Position = Projection * View * vec4(modelTransform,1);
-    fragmentColor = color * cosTheta;
+    fragmentColor = vec3(1-(vertexPosition_modelspace.z+20)/40,(vertexPosition_modelspace.z+20)/40,0) * cosTheta;
 	UV = uvs;
 
 }

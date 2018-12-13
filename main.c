@@ -7,75 +7,79 @@ int objectsCount = 0;
 object *objectArray;
 
 void createTerrain() {
-    
+
     int size = sqrt(NUMPOINTS);
     int newSize = size - 2;
-    
+
     siteObj sitesArray[newSize * newSize];
     objectArray = malloc(sizeof(object));
-    
+
     for(int x = 1; x < (size-1); x++) {
-        
+
         for(int y = 1; y < (size-1); y++) {
-            
+
             sitesArray[(x-1) + ((y-1) * newSize)] = siteMeshes[x + (y * size)];
-            
+
         }
     }
-    
+
     for(int x = 0; x < newSize; x++) {
-        
+
         for(int y = 0; y < newSize; y++) {
-            
+
             siteObj site = sitesArray[x + (y * newSize)];
-            
+
             for(int p = 0; p < site.numPoints; p++) {
-                
+
                 objectsCount++;
-                
+
                 v3 a,b,c;
-                
+
                 a = site.perimeter[p];
                 c = site.center;
-                
+
                 c.x -= (TWIDTH/2.f);
                 c.y -= (TWIDTH/2.f);
                 c.z = 0.f;
-                
+
                 if(p+1 >= site.numPoints) b = site.perimeter[0];
                 else b = site.perimeter[p+1];
-                
+
                 a.x = c.x + a.x;
                 a.y = c.y + a.y;
-                
+
                 b.x = c.x + b.x;
                 b.y = c.y + b.y;
-                
+
                 float red = randRange(0, 100) / 100.f;
                 float green = randRange(0, 100) / 100.f;
                 float blue = randRange(0, 100) / 100.f;
-                
+
                 object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
-                
+
                 float accident = frand(1.f);
                 
-                makeNoisyTriangle(&newObject, a, b, c, 40, 10.f * accident);
+                makeNoisyTriangle(&newObject, a, b, c, 40, 30.f * accident);
                 
                 makeVBOSizeAndPush(&newObject);
-                
+
                 //v3 position = newV3(c.x - (TWIDTH/2.f), c.y - (TWIDTH/2.f), 0.f);
-                
+
                 //moveObjTo(&newObject, position);
-                
+
                 objectArray = realloc(objectArray, objectsCount * sizeof(object));
                 objectArray[objectsCount-1] = newObject;
-                
-                
-                
+
+
+
             }
-            
+
         }
     }
+    
+    //for(;;)
+    
+    //loadOBJModel("grey_wolf.obj");
 }
 
 int main() {
@@ -177,8 +181,8 @@ int main() {
     tex.height = twidth;
     tex.bufferSize = twidth * twidth;
 
-    genVoronoiMap(tex.buffer, 0.75);
-    printSitePoints();
+    genVoronoiMap(tex.buffer, 1);
+    // printSitePoints();
 
     // Create Map
 //    object map = makeShapeObject(RECT, (v3){WIDTH/20, WIDTH/20, 0.f}, (v3){1.f,1.f,1.f}, NULL,
@@ -187,7 +191,7 @@ int main() {
 
     createInitialEnvironment();
     createTerrain();
-    
+
 
     //////////////////////////////////////////////////////////////////////////////
     //                                MAIN LOOP                                 //
@@ -238,7 +242,7 @@ int main() {
         cameraPos = rotate(cameraPos, (v3){0,0,1}, yAngle);
         View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1}); // NOTE: camera is ALWAYS UPRIGHT!!!
 
-        printf("X:%f e Y:%f\n", xAngle, yAngle);
+        // printf("X:%f e Y:%f\n", xAngle, yAngle);
 
         // Update View Matrix
         glUniformMatrix4fv(ViewID, 1, GL_TRUE, (GLfloat *)&View);
@@ -250,7 +254,8 @@ int main() {
         for(int i = 0; i < objectsCount; i++) {
             drawObject(&objectArray[i]);
         }
-        // drawSites();
+        
+        //drawSites();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -263,7 +268,7 @@ int main() {
     for(int i = 0; i < objectsCount; i++) {
         freeObject(&objectArray[i]);
     }
-    
+
     for(int i = 0; i < NUMPOINTS; ++i) {
         free(siteMeshes[i].perimeter);
     }

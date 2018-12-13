@@ -54,11 +54,11 @@ bool isInCircle(v3 point, v3 center, float radius) {
 
 void makeVoronoiVerts() {
 
-	for(int i = 0; i < VORONOIPOINTS; ++i) {
-		voronoiPoints[i] = INVALID;
-	}
-
-	int index = 0;
+	// for(int i = 0; i < VORONOIPOINTS; ++i) {
+	// 	voronoiPoints[i] = INVALID;
+	// }
+	//
+	// int index = 0;
 
     for(int a = 0; a < NUMPOINTS; ++a) {
 
@@ -101,12 +101,12 @@ void makeVoronoiVerts() {
 						}
 
 	                    if(flag) {
-	                        voronoiPoints[index] = center;
+	                        // voronoiPoints[index] = center;
 							// printf("Voronoi Point %d: (%f,%f,%f)\n", index,
 							// 										 voronoiPoints[index].x,
 							// 									 	 voronoiPoints[index].y,
 							// 									 	 voronoiPoints[index].z);
-							++index;
+							// ++index;
 
 							siteMeshes[a].perimeter = realloc(siteMeshes[a].perimeter,
 													  		  (siteMeshes[a].numPoints+1)*
@@ -187,54 +187,54 @@ void genVoronoiMap(uint32_t *tex, float variation) {
 		qsort(siteMeshes[i].perimeter, numPoints, sizeof(v3), comp);
 	}
 
-	for(int i = 0; i < TWIDTH; ++i) {
-        for(int j = 0; j < TWIDTH; ++j) {
-            int index = j + i*TWIDTH;
-
-            uint32_t dist = UINT_MAX;
-            int nextClosest = 0;
-
-            for(int k = 0; k < NUMPOINTS; k++) {
-                int dx = fabsf(j-points[k].x);
-                int dy = fabsf(i-points[k].y);
-                int newDist = intSqDist(dx, dy);
-
-                if(dist > newDist) {
-                    dist = newDist;
-                    nextClosest = k;
-                }
-
-            }
-
-			bool paint = true;
-
-			for(int k = 0; k < VORONOIPOINTS; ++k) {
-				int dx = fabsf(j-voronoiPoints[k].x);
-				int dy = fabsf(i-voronoiPoints[k].y);
-				int distance = (int)intSqDist(dx, dy);
-				if(distance < 2) {
-					tex[index] = 0xff0000ff;
-					paint = false;
-					break;
-				}
-			}
-
-			if(paint) {
-#if 1
-				tex[index] = dist < 4 ? 0xff00ff00 : 0xff << 24 |
-	 			 			 (int)(((points[nextClosest].z)) * 0xff) << 8;
-#else
-				tex[index] = dist < 4 ? 0xff00ff00 : 0xff << 24 |
-							 (int)(((float)nextClosest/NUMPOINTS) * 0xff) << 16 |
-	 			 			 (int)(((float)nextClosest/NUMPOINTS) * 0xff) << 8 |
-							 (int)(((float)nextClosest/NUMPOINTS) * 0xff);
-#endif
-			}
-			// tex[index] = 0xff << 24 |
- 			// 			 (int)(((points[nextClosest].z)) * 0xff) << 8;
-
-        }
-    }
+// 	for(int i = 0; i < TWIDTH; ++i) {
+//         for(int j = 0; j < TWIDTH; ++j) {
+//             int index = j + i*TWIDTH;
+//
+//             uint32_t dist = UINT_MAX;
+//             int nextClosest = 0;
+//
+//             for(int k = 0; k < NUMPOINTS; k++) {
+//                 int dx = fabsf(j-points[k].x);
+//                 int dy = fabsf(i-points[k].y);
+//                 int newDist = intSqDist(dx, dy);
+//
+//                 if(dist > newDist) {
+//                     dist = newDist;
+//                     nextClosest = k;
+//                 }
+//
+//             }
+//
+// 			bool paint = true;
+//
+// 			for(int k = 0; k < VORONOIPOINTS; ++k) {
+// 				int dx = fabsf(j-voronoiPoints[k].x);
+// 				int dy = fabsf(i-voronoiPoints[k].y);
+// 				int distance = (int)intSqDist(dx, dy);
+// 				if(distance < 2) {
+// 					tex[index] = 0xff0000ff;
+// 					paint = false;
+// 					break;
+// 				}
+// 			}
+//
+// 			if(paint) {
+// #if 1
+// 				tex[index] = dist < 4 ? 0xff00ff00 : 0xff << 24 |
+// 	 			 			 (int)(((points[nextClosest].z)) * 0xff) << 8;
+// #else
+// 				tex[index] = dist < 4 ? 0xff00ff00 : 0xff << 24 |
+// 							 (int)(((float)nextClosest/NUMPOINTS) * 0xff) << 16 |
+// 	 			 			 (int)(((float)nextClosest/NUMPOINTS) * 0xff) << 8 |
+// 							 (int)(((float)nextClosest/NUMPOINTS) * 0xff);
+// #endif
+// 			}
+// 			// tex[index] = 0xff << 24 |
+//  			// 			 (int)(((points[nextClosest].z)) * 0xff) << 8;
+//
+//         }
+//     }
 
 }
 
