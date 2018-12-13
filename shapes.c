@@ -309,11 +309,11 @@ bool noiseUp = true;
 
 float randomizeNoise(float noise) {
     
-    float randomA = randRange(0, 100) / 100.f;
+    float randomA = frand(1.f);
     
-    if(randomA >= invertChance) {
-        invertChance = 0.5f;
+    if(randomA <= invertChance) {
         noiseUp = !noise;
+        invertChance = 0.5f;
     }
     
     else {
@@ -321,10 +321,10 @@ float randomizeNoise(float noise) {
     }
 
     
-    float randomB = randRange(70, 95) / 100.f;
+    float randomB = frand(1.f);
     
     if(noiseUp) return noise * randomB;
-    else return -noise * randomB;
+    else return -(noise * randomB);
     
 }
 
@@ -344,6 +344,7 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
     
     v3 *verts = malloc(sizeof(v3) * triangles_on_face * 3);
     v2 *uvs = malloc(sizeof(v2) * triangles_on_face * 3);
+    v3 *normals = malloc(sizeof(v3) * triangles_on_face * 3);
     v3 curr_point = pointA;
     v3 start_point = pointA;
     
@@ -394,6 +395,7 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
             v3 b = { .x = a.x + change_x_x, .y = a.y + change_x_y, .z = a.z + change_x_z };
             v3 c = { .x = a.x + change_y_x, .y = a.y + change_y_y, .z = a.z + change_y_z };
             
+            v3 safeB = b;
             
             if(l < triangle_layers) {
                 
@@ -419,6 +421,20 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
             verts[index + 1] = b;
             verts[index + 2] = c;
             
+            v3 dist_a = {.x = a.x - c.x, .y = a.y - c.y, .z = a.z - c.z};
+            v3 dist_b = {.x = b.x - c.x, .y = b.y - c.y, .z = b.z - c.z};
+            
+            v3 face_normal = crossProduct(dist_a, dist_b);
+            
+            float normalize = dist(face_normal);
+            face_normal.x = face_normal.x / normalize;
+            face_normal.y = face_normal.y / normalize;
+            face_normal.z = face_normal.z / normalize;
+            
+            normals[index] = face_normal;
+            normals[index + 1] = face_normal;
+            normals[index + 2] = face_normal;
+            
             v2 uv_a = { .x = (float)(point_number + plus) / (base_points - 1), .y = fabsf(l - (float) triangle_layers) / triangle_layers };
             v2 uv_b = { .x = (float)(point_number + plus + 1) / (base_points - 1), .y = fabsf(l - (float) triangle_layers) / triangle_layers };
             v2 uv_c = { .x = (float)(point_number + plus + 0.5) / (base_points - 1), .y = fabsf(l - 1 - (float) triangle_layers) / triangle_layers };
@@ -441,7 +457,7 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
             
             if(t > 1) {
                 
-                v3 d = { .x = b.x + change_y_x, .y = b.y + change_y_y, .z = b.z + change_y_z };
+                v3 d = { .x = safeB.x + change_y_x, .y = safeB.y + change_y_y, .z = safeB.z + change_y_z };
                 
                 //point D is not on border
                 if((t-4) > 0) {
@@ -457,6 +473,20 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
                 verts[index] = b;
                 verts[index + 1] = d;
                 verts[index + 2] = c;
+                
+                v3 dist_b2 = {.x = b.x - c.x, .y = b.y - c.y, .z = b.z - c.z};
+                v3 dist_d = {.x = d.x - c.x, .y = d.y - c.y, .z = d.z - c.z};
+                
+                v3 face_normal = crossProduct(dist_b2, dist_d);
+                
+                float normalize = dist(face_normal);
+                face_normal.x = face_normal.x / normalize;
+                face_normal.y = face_normal.y / normalize;
+                face_normal.z = face_normal.z / normalize;
+                
+                normals[index] = face_normal;
+                normals[index + 1] = face_normal;
+                normals[index + 2] = face_normal;
                 
                 v2 uv_d = { .x = (float)(point_number + 1.5 + plus) / (base_points - 1), .y = fabsf(l - 1 - (float) triangle_layers) / triangle_layers };
                 
@@ -502,14 +532,15 @@ void makeNoisyTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivi
         obj->vertices[(i*3)+1] = verts[x].y;
         obj->vertices[(i*3)+2] = verts[x].z;
         
-        obj->normals[(i*3)] = face_normal.x;
-        obj->normals[(i*3)+1] = face_normal.y;
-        obj->normals[(i*3)+2] = face_normal.z;
+        obj->normals[(i*3)] = normals[x].x;
+        obj->normals[(i*3)+1] = normals[x].y;
+        obj->normals[(i*3)+2] = normals[x].z;
         
         obj->uvs[(i*2)] = uvs[x].x;
         obj->uvs[(i*2)+1] = uvs[x].y;
     }
     
+    free(normals);
     free(verts);
     free(uvs);
     

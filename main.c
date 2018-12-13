@@ -57,9 +57,9 @@ void createTerrain() {
                 
                 object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
                 
-                float accident = randRange(0, 20);
+                float accident = frand(1.f);
                 
-                makeNoisyTriangle(&newObject, a, b, c, 2, 10.f);
+                makeNoisyTriangle(&newObject, a, b, c, 20, 10.f * accident);
                 
                 makeVBOSizeAndPush(&newObject);
                 
