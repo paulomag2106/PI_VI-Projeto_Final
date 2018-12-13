@@ -36,6 +36,8 @@
 
 float xOffset;
 float yOffset;
+float yAngle, xAngle;
+bool leftClick;
 
 #define MAXSPD 3.f
 

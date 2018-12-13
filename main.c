@@ -8,7 +8,7 @@ int main() {
     srand((int)time(NULL));
     xOffset = yOffset = 0.f;
     zoom = WIDTH/10 + 50;
-    v3 camerapos = {0,0,zoom};
+    //v3 camerapos = {0,0,zoom};
 
     double timepassed = 0.f;
     bool isPaused = true;
@@ -16,6 +16,8 @@ int main() {
 
     width = WIDTH;
     height = HEIGHT;
+    xAngle = -0.36f;
+    yAngle = -0.8f;
 
     // Initialize GLFW
     if(!glfwInit()) {
@@ -31,7 +33,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Initialize window
-    window = glfwCreateWindow(width, height, "PI VI - ADO 3", NULL, NULL);
+    window = glfwCreateWindow(width, height, "PI VI", NULL, NULL);
     if(!window) {
         puts("Error opening GLFW window.");
         glfwTerminate();
@@ -76,7 +78,7 @@ int main() {
     // Perspective Projection matrix
     float FOV = M_PI/4.f;
     float near = 0.5f;
-    float far = 200.f;
+    float far = 550.f;
     float ratio = (float)width/height;
     m4x4 Projection = perspective(FOV, near, far, ratio);
 
@@ -154,11 +156,14 @@ int main() {
         }
 
         // Zoom View Matrix
-        camerapos.x += xOffset;
-        camerapos.y += yOffset;
-        camerapos.z = zoom;
-        View = lookAt(camerapos,
-                      (v3){camerapos.x,camerapos.y,0},(v3){0,1,0});
+        // Rotate and Zoom View Matrix
+        v3 cameraPos = {0, 0, zoom};
+        cameraPos = rotate(cameraPos, (v3){1,0,0}, xAngle+M_PI/2);
+        cameraPos = rotate(cameraPos, (v3){0,0,1}, yAngle);
+        View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1}); // NOTE: camera is ALWAYS UPRIGHT!!!
+        
+        printf("X:%f e Y:%f\n", xAngle, yAngle);
+        
         // Update View Matrix
         glUniformMatrix4fv(ViewID, 1, GL_TRUE, (GLfloat *)&View);
 

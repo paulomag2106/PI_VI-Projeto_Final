@@ -15,7 +15,7 @@ v3 points[NUMPOINTS];
 siteObj siteMeshes[NUMPOINTS];
 v3 voronoiPoints[VORONOIPOINTS];
 
-void printSitePoints();
+void printSitePoints(void);
 float getD(v3 a, v3 b, v3 c);
 float getU(v3 a, v3 b);
 float getV(v3 b, v3 c);

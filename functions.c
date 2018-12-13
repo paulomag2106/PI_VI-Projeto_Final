@@ -258,28 +258,28 @@ float points_distance(v3 pointA, v3 pointB) {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-    // int vertical = 0;
-    // int horizontal = 0;
-    bool d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-    bool w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-    bool a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    bool s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-
-    if(s) {
-        yOffset = lerp(yOffset, 0.25, -MAXSPD);
-    } else if(w) {
-        yOffset = lerp(yOffset, 0.25, MAXSPD);
-    } else {
-        yOffset = 0;
-    }
-
-    if(a) {
-        xOffset = lerp(xOffset, 0.25, -MAXSPD);
-    } else if(d) {
-        xOffset = lerp(xOffset, 0.25, MAXSPD);
-    } else {
-        xOffset = 0;
-    }
+//    // int vertical = 0;
+//    // int horizontal = 0;
+//    bool d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+//    bool w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+//    bool a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+//    bool s = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
+//
+//    if(s) {
+//        yOffset = lerp(yOffset, 0.25, -MAXSPD);
+//    } else if(w) {
+//        yOffset = lerp(yOffset, 0.25, MAXSPD);
+//    } else {
+//        yOffset = 0;
+//    }
+//
+//    if(a) {
+//        xOffset = lerp(xOffset, 0.25, -MAXSPD);
+//    } else if(d) {
+//        xOffset = lerp(xOffset, 0.25, MAXSPD);
+//    } else {
+//        xOffset = 0;
+//    }
     //
      if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE) key_pressed[0] = true;
      if(key == GLFW_KEY_Q && action == GLFW_RELEASE) key_pressed[1] = true;
@@ -301,28 +301,51 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void cursor_position_callback(GLFWwindow* window) {
 
-    // bool leftClick = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-    // if(leftClick) {
-    //
-    //     int width, height;
-    //
-    //     glfwGetCursorPos(window, &mouseX, &mouseY);
-    //     glfwGetWindowSize(window, &width, &height);
-    //
-    //     double deltax = mouseX - oldx;
-    //     double deltay = mouseY - oldy;
-    //     // printf("Delta: (%f,%f)\n", deltax, deltay);
-    //
-    //     xOffset = deltax/20;
-    //     yOffset = deltay/20;
-    //     // printf("Offset: (%f,%f)\n", xOffset, yOffset);
-    //
-    //     oldx = mouseX;
-    //     oldy = mouseY;
-    //
-    // }
-    //
-    // // oldx = oldy = mouseX = mouseY = 0;
+    if(!(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)) {
+        leftClick = false;
+    }
+    
+    if(leftClick) {
+        
+        double oldx = mouseX;
+        double oldy = mouseY;
+        
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+//        int width, height;
+//        glfwGetWindowSize(window, &width, &height);
+        
+        double deltax = mouseX - oldx;
+        double deltay = mouseY - oldy;
+        
+        const float speed = 1.f;
+        
+        xAngle += speed * -deltay * deltaTime;
+        yAngle += speed * -deltax * deltaTime;
+        
+        //xAngle = clamp(xAngle, -(M_PI-0.1f)/2, (M_PI-0.1f)/2);
+        
+//        if(deltax > 0) {
+//            yAngle += speed * deltay * deltaTime;
+//        } else if(deltax < 0) {
+//            yAngle += (float)(height/3)/(height*M_PI*2);
+//        }
+//
+//        if(deltay < 0) {
+//            xAngle += (float)(width/3)/(width*M_PI*2);
+//        } else if(deltay > 0) {
+//            xAngle -= (float)(width/3)/(width*M_PI*2);
+//        }
+//
+//        // NOTE: Don't allow X camera angle to go OVER the -90 to 90 degrees, with
+//        // small margin of 0.05 radians so object won't disappear from view
+//        xAngle = clamp(xAngle, -(M_PI-0.1f)/2, (M_PI-0.1f)/2);
+        
+    }
+    
+    if(glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+        leftClick = true;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+    }
 
 }
 
