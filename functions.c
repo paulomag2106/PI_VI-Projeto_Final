@@ -351,7 +351,7 @@ void cursor_position_callback(GLFWwindow* window) {
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     zoom += yoffset;
-    zoom = clamp(zoom, 15.f, WIDTH/10 +50);
+    zoom = clamp(zoom, 15.f, WIDTH/10 +500);
 }
 
 void blockFramerate() {
