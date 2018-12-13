@@ -161,9 +161,9 @@ int main() {
         cameraPos = rotate(cameraPos, (v3){1,0,0}, xAngle+M_PI/2);
         cameraPos = rotate(cameraPos, (v3){0,0,1}, yAngle);
         View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1}); // NOTE: camera is ALWAYS UPRIGHT!!!
-        
+
         printf("X:%f e Y:%f\n", xAngle, yAngle);
-        
+
         // Update View Matrix
         glUniformMatrix4fv(ViewID, 1, GL_TRUE, (GLfloat *)&View);
 
