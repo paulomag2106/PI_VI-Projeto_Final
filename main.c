@@ -58,9 +58,9 @@ void createTerrain() {
                 object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
 
                 float accident = frand(1.f);
-                
+
                 makeNoisyTriangle(&newObject, a, b, c, 40, 30.f * accident);
-                
+
                 makeVBOSizeAndPush(&newObject);
 
                 //v3 position = newV3(c.x - (TWIDTH/2.f), c.y - (TWIDTH/2.f), 0.f);
@@ -76,9 +76,9 @@ void createTerrain() {
 
         }
     }
-    
+
     //for(;;)
-    
+
     //loadOBJModel("grey_wolf.obj");
 }
 
@@ -151,6 +151,7 @@ int main() {
 
     // Create and compile our GLSL program from the shaders
     programID = loadShaders("vertex.shader", "fragment.shader");
+    // programID2 = loadShaders("vertex.shader", "fragment.shader");
     glUseProgram(programID);
 
     // Perspective Projection matrix
@@ -254,7 +255,7 @@ int main() {
         for(int i = 0; i < objectsCount; i++) {
             drawObject(&objectArray[i]);
         }
-        
+
         //drawSites();
 
         glfwSwapBuffers(window);
