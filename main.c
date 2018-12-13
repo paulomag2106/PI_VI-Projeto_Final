@@ -112,6 +112,7 @@ int main() {
     updateTexture(&map, &tex);
 
     createInitialEnvironment();
+    
 
     //////////////////////////////////////////////////////////////////////////////
     //                                MAIN LOOP                                 //
