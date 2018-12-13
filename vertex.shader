@@ -19,9 +19,13 @@ out vec2 UV;
 out vec3 fragmentColor;
 void main() {
 
+	// Simulate "lighting" based on camera position
+	vec3 lightPos = vec3(View[0][2], View[1][2], View[2][2]);
+	float cosTheta = clamp(dot(normals, lightPos),0.1f,0.9f);
+
 	vec3 modelTransform = scale * vertexPosition_modelspace + pos;
 	gl_Position = Projection * View * vec4(modelTransform,1);
-    fragmentColor = color;
+    fragmentColor = color * cosTheta;
 	UV = uvs;
 
 }
