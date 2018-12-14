@@ -1,11 +1,18 @@
 #include "model.h"
 
-Site sites[NUMPOINTS];
+#define MODELSCALE 13.2f
+#define MODELDIST 20.f
+#define MODEL_Z 25.f
+#define GROUPDIST 50.f
+
+
+v4 standardColor = (v4) {1.f,1.f,1.f,1.f};
+
 
 void setNearest(int site_index) {
-
-
-    int value = sqrt(NUMPOINTS);
+    
+    
+    int value = sqrt(sitesArrayCount);
     int near_index = 0;
 
     int yStart = -1, xStart = -1, yEnd = 1, xEnd = 1;
@@ -26,7 +33,7 @@ void setNearest(int site_index) {
 
             int index = site_index + (x + (y * value));
 
-            if (index < 0 || index >= NUMPOINTS) sites[site_index].nearest[near_index++] = -1;
+            if (index < 0 || index >= sitesArrayCount) sites[site_index].nearest[near_index++] = -1;
             else if(index != site_index) sites[site_index].nearest[near_index++] = index;
 
         }
@@ -38,33 +45,86 @@ void setNearest(int site_index) {
 
 void createInitialEnvironment() {
 
-    for(int i = 0; i < NUMPOINTS; i++) {
+    sites = malloc(sizeof(Site) * sitesArrayCount);
+    
+    for(int i = 0; i < sitesArrayCount; i++) {
 
-        float x = (float)(((points[i].x) * (WIDTH/10.f)) / (TWIDTH)) - (WIDTH/20.f);
-        float y = (float)(((points[i].y) * (WIDTH/10.f)) / (TWIDTH)) - (WIDTH/20.f);
-
-        sites[i].x = x;
-        sites[i].y = y;
-
-        sites[i].slopeAngle = points[i].z;
-
+        sites[i].x = sitesArray[i].center.x;
+        sites[i].y = sitesArray[i].center.y;
+        
+        sites[i].slopeAngle = sitesArray[i].center.z;
+        
         float preyDensity = frand(1.f) * clamp(sites[i].slopeAngle, 0.4f, 0.6f);
         float wolfDensity = frand(1.f) * clamp((1.f - sites[i].slopeAngle), 0.3f, 0.8f);
-
-        object preyObj = loadOBJModel("models/grey_wolf.obj");
-        object wolfObj = loadOBJModel("models/deer.obj");
         
-//        object preyObj = makeShapeObject(TRIANGLE, newV3(1, 1, 0), newV3(0, 0, 1), NULL, GL_DYNAMIC_DRAW, 0);
-//        object wolfObj = makeShapeObject(ELLIPSOID_2D, newV3(1, 1, 0), newV3(1, 0, 0), NULL, GL_DYNAMIC_DRAW, 2);
-
-        preyObj.position = newV3(sites[i].x + 1.f, sites[i].y, 5.1f);
-        wolfObj.position = newV3(sites[i].x - 1.f, sites[i].y, 5.11f);
-
-        scaleObjTo(&preyObj, newV3(18.2f*preyDensity, 18.2f*preyDensity, 18.2f*preyDensity));
-        scaleObjTo(&wolfObj, newV3(12.2f*wolfDensity, 12.2f*wolfDensity, 12.2f*wolfDensity));
-
-        sites[i].prey = (Prey){preyObj, preyDensity};
-        sites[i].wolf = (Wolf){wolfObj, wolfDensity};
+        ModelGroup wolfGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
+        ModelGroup preyGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
+        
+        for(int m = 0; m < MODELCOUNT; m++) {
+            
+            object preyObj = loadOBJModel("models/grey_wolf.obj");
+            object wolfObj = loadOBJModel("models/deer.obj");
+            
+            preyObj.color = standardColor;
+            wolfObj.color = standardColor;
+            
+            wolfGroup.objectArray[m] = wolfObj;
+            preyGroup.objectArray[m] = preyObj;
+            
+            v3 preyPosition = newV3(sites[i].x + GROUPDIST, sites[i].y, MODEL_Z);
+            v3 wolfPosition = newV3(sites[i].x - GROUPDIST, sites[i].y, MODEL_Z);
+            
+            float xChange = MODELDIST, yChange = MODELDIST;
+            
+            switch (m) {
+                case 0:
+                    xChange = 0.f;
+                    yChange = 0.f;
+                case 1:
+                    xChange = MODELDIST;
+                    yChange = -MODELDIST;
+                case 2:
+                    xChange = MODELDIST;
+                    yChange = MODELDIST;
+                case 3:
+                    xChange = -MODELDIST;
+                    yChange = -MODELDIST;
+                case 4:
+                    xChange = -MODELDIST;
+                    yChange = MODELDIST;
+                case 6:
+                    xChange = 0.f;
+                    yChange = MODELDIST * 2.f;
+                case 7:
+                    xChange = 0.f;
+                    yChange = MODELDIST * -2.f;
+                case 8:
+                    xChange = MODELDIST * 2.f;
+                    yChange = 0.f;
+                case 9:
+                    xChange = MODELDIST * -2.f;
+                    yChange = 0.f;
+            }
+            
+            wolfPosition.x += xChange;
+            wolfPosition.y += yChange;
+            
+            preyPosition.x += -xChange;
+            preyPosition.y += yChange;
+            
+            preyObj.position = preyPosition;
+            wolfObj.position = wolfPosition;
+            
+            scaleObjTo(&preyObj, newV3(MODELSCALE*preyDensity, MODELSCALE*preyDensity, MODELSCALE*preyDensity));
+            scaleObjTo(&wolfObj, newV3(MODELSCALE*wolfDensity, MODELSCALE*wolfDensity, MODELSCALE*wolfDensity));
+            
+            rotateObjBy(&preyObj, newV3(0, 0, 1), M_PI / 2.f);
+            rotateObjBy(&wolfObj, newV3(0, 0, 1), -M_PI / 2.f);
+        }
+        
+        
+        sites[i].prey = (Prey){preyGroup, preyDensity};
+        sites[i].wolf = (Wolf){wolfGroup, wolfDensity};
 
         sites[i].nextSite = -1;
 
@@ -79,9 +139,9 @@ void createInitialEnvironment() {
 
 void timePasses() {
 
-    // printf("time has passed!\n");
+    printf("time has passed!\n");
 
-    for(int i = 0; i < NUMPOINTS; i++) {
+    for(int i = 0; i < sitesArrayCount; i++) {
 
         float w = sites[i].wolf.strength;
         float p = sites[i].prey.preyDensity;
@@ -167,7 +227,7 @@ void timePasses() {
     }
 
 
-    for(int i = 0; i < NUMPOINTS; i++) {
+    for(int i = 0; i < sitesArrayCount; i++) {
 
         if(sites[i].nextSite >= 0) {
 
@@ -186,37 +246,63 @@ void timePasses() {
         }
     }
 
-    for(int i = 0; i < NUMPOINTS; i++) {
+    for(int i = 0; i < sitesArrayCount; i++) {
 
-        float preyDensity = (sites[i].prey.preyDensity) * 1.5;
-        float wolfDensity = (sites[i].wolf.strength) * 1.5;
+        float preyDensity = (sites[i].prey.preyDensity);
+        float wolfDensity = (sites[i].wolf.strength);
 
-        if(preyDensity <= 0.0001f) preyDensity = 0.f;
-        else preyDensity += 0.5;
+//        if(preyDensity <= 0.0001f) preyDensity = 0.f;
+//        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
 
-        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
-        else wolfDensity += 0.5;
-
-
-        scaleObjTo(&sites[i].prey.obj, newV3(preyDensity, preyDensity, 0));
-        scaleObjTo(&sites[i].wolf.obj, newV3(wolfDensity, wolfDensity, 0));
+        for(int x = 0; x < 10; x++) {
+            
+            float c = (float) x / 10.f;
+            
+            if(c >= preyDensity) {
+                sites[i].prey.models.objectArray[x].color = standardColor;
+            }
+            
+            else {
+                sites[i].prey.models.objectArray[x].color.w = 0.f;
+            }
+            
+            
+            if(c >= wolfDensity) {
+                sites[i].wolf.models.objectArray[x].color = standardColor;
+            }
+            
+            else {
+                sites[i].wolf.models.objectArray[x].color.w = 0.f;
+            }
+            
+        }
     }
 }
 
 
 void drawSites() {
 
-    for(int i = 0; i < NUMPOINTS; i++) {
-        drawObject(&sites[i].prey.obj);
-        drawObject(&sites[i].wolf.obj);
+    for(int i = 0; i < sitesArrayCount; i++) {
+        
+        for(int j = 0; j < MODELCOUNT; j++) {
+            
+            drawObject(&sites[i].prey.models.objectArray[j]);
+            drawObject(&sites[i].wolf.models.objectArray[j]);
+        }
     }
 
 }
 
 void freeSites() {
 
-    for(int i = 0; i < NUMPOINTS; i++) {
-        freeObject(&sites[i].prey.obj);
-        freeObject(&sites[i].wolf.obj);
+    for(int i = 0; i < sitesArrayCount; i++) {
+        for(int j = 0; j < MODELCOUNT; j++) {
+            
+            freeObject(&sites[i].prey.models.objectArray[j]);
+            freeObject(&sites[i].wolf.models.objectArray[j]);
+        }
     }
+    
+    free(sites);
+    free(sitesArray);
 }
