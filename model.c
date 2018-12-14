@@ -7,10 +7,12 @@
 #define MODEL_Z 1.f
 #define GROUPDIST 5.f
 #define TURNSTOTEST 200
+#define MOVEDISTANCE 25.f
 
 
-v4 wolfColor = (v4) {0.701f, (v3){0.701f, 0.701f, 1.f}};
-v4 preyColor = (v4) {0.494f, (v3){0.286f, 0.286f, 1.f}};
+v4 wolfColor = (v4) {0.5f, (v3){0.6f, 1.f, 1.f}};
+v4 preyColor = (v4) {0.5f, (v3){0.6f, 1.f, 1.f}};
+
 
 void changeModels() {
     
@@ -26,21 +28,39 @@ void changeModels() {
             
             float c = (float) x / 10.f;
             
+            ModelGroup wolfGroup = sites[i].wolf.models;
+            ModelGroup preyGroup = sites[i].prey.models;
+            
+            if(c < 0.001f) c = 0.001f;
+            
             if(preyDensity >= c) {
-                sites[i].prey.models.objectArray[x].color = preyColor;
+                
+                if(simulation_speed == FAST) preyGroup.objectArray[x].color.vec.z = 1.f;
+                
+                else preyGroup.animate[x] = 1;
+                
             }
             
-            else {
-                sites[i].prey.models.objectArray[x].color.vec.z = 0.f;
+            else  {
+                
+                if(simulation_speed == FAST) preyGroup.objectArray[x].color.vec.z = 0.f;
+                
+                else preyGroup.animate[x] = -1;
             }
             
             
             if(wolfDensity >= c) {
-                sites[i].wolf.models.objectArray[x].color = wolfColor;
+                
+                if(simulation_speed == FAST) wolfGroup.objectArray[x].color.vec.z = 1.f;
+                
+                else wolfGroup.animate[x] = 1;
             }
             
             else {
-                sites[i].wolf.models.objectArray[x].color.vec.z = 0.f;
+                
+                if(simulation_speed == FAST) wolfGroup.objectArray[x].color.vec.z = 0.f;
+                
+                else wolfGroup.animate[x] = -1;
             }
             
         }
@@ -88,6 +108,69 @@ void setNearest(int site_index) {
 
 }
 
+void positionWolfModels(Site site) {
+    
+    for(int m = 0; m < MODELCOUNT; m++) {
+        
+        v3 wolfPosition = newV3(site.modelX, site.modelY, MODEL_Z);
+        
+        wolfPosition.x -= (TWIDTH/2.f);
+        wolfPosition.y -= (TWIDTH/2.f);
+        
+        wolfPosition.x -= GROUPDIST;
+        
+        float xChange = MODELDIST_X, yChange = MODELDIST_Y;
+        
+        switch (m) {
+            case 0:
+                xChange = 0.f;
+                yChange = 0.f;
+                break;
+            case 1:
+                xChange = -MODELDIST_X;
+                yChange = MODELDIST_Y;
+                break;
+            case 2:
+                xChange = -MODELDIST_X;
+                yChange = -MODELDIST_Y;
+                break;
+            case 3:
+                xChange = -2.f * MODELDIST_X;
+                yChange = 0.f;
+                break;
+            case 4:
+                xChange = -2.f * MODELDIST_X;
+                yChange = 2.f * MODELDIST_Y;
+                break;
+            case 5:
+                xChange = -2.f * MODELDIST_X;
+                yChange = -2.f * MODELDIST_Y;
+                break;
+            case 6:
+                xChange = -3.f * MODELDIST_X;
+                yChange = MODELDIST_Y;
+                break;
+            case 7:
+                xChange = -3.f * MODELDIST_X;
+                yChange = -MODELDIST_Y;
+                break;
+            case 8:
+                xChange = -4.f * MODELDIST_X;
+                yChange = MODELDIST_Y;
+                break;
+            case 9:
+                xChange = -4.f * MODELDIST_X;
+                yChange = -MODELDIST_Y;
+                break;
+        }
+        
+        wolfPosition.x += xChange;
+        wolfPosition.y += yChange;
+        
+        site.wolf.models.objectArray[m].position = wolfPosition;
+    }
+}
+
 void createInitialEnvironment() {
 
     sites = malloc(sizeof(Site) * sitesArrayCount);
@@ -126,13 +209,13 @@ void createInitialEnvironment() {
         preyDensity = 0.5;
         wolfDensity = 0.5;
         
-        ModelGroup wolfGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
-        ModelGroup preyGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
+        ModelGroup wolfGroup = {malloc(sizeof(int) * MODELCOUNT), MODELCOUNT, malloc(sizeof(object) * MODELCOUNT), 0, MOVEDISTANCE};
+        ModelGroup preyGroup = {malloc(sizeof(int) * MODELCOUNT), MODELCOUNT, malloc(sizeof(object) * MODELCOUNT), 0, MOVEDISTANCE};
         
         for(int m = 0; m < MODELCOUNT; m++) {
             
-            object preyObj = loadOBJModel("models/grey_wolf.obj");
-            object wolfObj = loadOBJModel("models/deer.obj");
+            object preyObj = loadOBJModel("models/deer.obj");
+            object wolfObj = loadOBJModel("models/grey_wolf.obj");
             
             preyObj.color = preyColor;
             wolfObj.color = wolfColor;
@@ -147,6 +230,9 @@ void createInitialEnvironment() {
             
             wolfPosition.x -= GROUPDIST;
             preyPosition.x += GROUPDIST;
+            
+            wolfGroup.animate[m] = 0;
+            preyGroup.animate[m] = 0;
             
             float xChange = MODELDIST_X, yChange = MODELDIST_Y;
             
@@ -224,7 +310,9 @@ void createInitialEnvironment() {
         setNearest(i);
     }
 
+    simulation_speed = FAST;
     changeModels();
+    simulation_speed = SLOW;
 }
 
 
@@ -246,7 +334,6 @@ void timePasses() {
             sites[i].huntSuccess[turn] = -1;
         
         }
-        
         
 
         float ratio;
@@ -311,6 +398,10 @@ void timePasses() {
                 sites[i].wolf.strength += huntWolfEffect;
                 sites[i].wolf.strength = clamp(sites[i].wolf.strength, 0.f, 1.f);
                 
+                sites[i].wolf.models.move = 1;
+                sites[i].wolf.models.distance = MOVEDISTANCE;
+                
+                
                 if(turn < TURNSTOTEST) sites[i].huntSuccess[turn] = 1;
 
             }
@@ -352,8 +443,39 @@ void timePasses() {
 
         }
     }
-
+    
     changeModels();
+}
+
+void printHistory() {
+    
+    for(int s = 0; s < sitesArrayCount; s++) {
+        
+        Site site = sites[s];
+        
+        printf("Sitio %d\n", s);
+        
+        for(int t = 0; t < TURNSTOTEST; t++) {
+            
+            printf("Densidade de Lobos: %.5f, Ungulados: %.5f, ", site.wolfHistory[t], site.preyHistory[t]);
+            
+            if(site.huntSuccess[t] == 0) {
+                printf("Caça falhou.\n");
+            }
+            
+            else if(site.huntSuccess[t] == 1) {
+                printf("Caça bem sucedida.\n");
+            }
+            
+            else {
+                printf("Lobos migraram.\n");
+            }
+        }
+        
+        printf("\n");
+    }
+
+    
 }
 
 void createCSV() {
@@ -383,6 +505,109 @@ void drawSites() {
     for(int i = 0; i < sitesArrayCount; i++) {
         
         for(int j = 0; j < MODELCOUNT; j++) {
+            
+            bool animatedPrey = false, animatedWolf = false;
+            
+            if(simulation_speed != FAST) {
+                
+                //PREY FADE IN OUT
+                if(sites[i].prey.models.animate[j] < 0) {
+                    
+                    animatedPrey = true;
+                    
+                    if(simulation_speed == NORMAL)
+                        sites[i].prey.models.objectArray[j].color.vec.z -= (deltaTime / 0.25f);
+                    
+                    else
+                        sites[i].prey.models.objectArray[j].color.vec.z -= (deltaTime / 0.5f);
+                }
+                
+                else if(sites[i].prey.models.animate[j] > 0) {
+                    
+                    animatedPrey = true;
+                    
+                    if(simulation_speed == NORMAL)
+                        sites[i].prey.models.objectArray[j].color.vec.z += (deltaTime / 0.25f);
+                    
+                    else
+                        sites[i].prey.models.objectArray[j].color.vec.z += (deltaTime / 0.5f);
+                    
+                }
+                
+                
+                //WOLF FADE IN OUT
+                if(sites[i].wolf.models.animate[j] < 0) {
+                    
+                    animatedWolf = true;
+                    
+                    if(simulation_speed == NORMAL)
+                        sites[i].wolf.models.objectArray[j].color.vec.z -= (deltaTime / 0.25f);
+                    
+                    else
+                        sites[i].wolf.models.objectArray[j].color.vec.z -= (deltaTime / 0.5f);
+                }
+                
+                else if(sites[i].wolf.models.animate[j] > 0) {
+                    
+                    animatedWolf = true;
+                    
+                    if(simulation_speed == NORMAL)
+                        sites[i].wolf.models.objectArray[j].color.vec.z += (deltaTime / 0.25f);
+                    
+                    else
+                        sites[i].wolf.models.objectArray[j].color.vec.z += (deltaTime / 0.5f);
+                    
+                }
+                
+                
+                if(animatedPrey) {
+                    if(sites[i].prey.models.objectArray[j].color.vec.z <= 0.001f || sites[i].prey.models.objectArray[j].color.vec.z > 0.999f ) {
+                        sites[i].prey.models.animate[j] = 0;
+                    }
+                }
+                
+                if(animatedWolf) {
+                    if(sites[i].wolf.models.objectArray[j].color.vec.z <= 0.001f || sites[i].wolf.models.objectArray[j].color.vec.z > 0.999f ) {
+                        sites[i].wolf.models.animate[j] = 0;
+                    }
+                }
+            }
+            
+            float value = 0.f;
+            
+            if(simulation_speed == NORMAL) {
+                value = (deltaTime / 0.4);
+            }
+            
+            else if(simulation_speed == SLOW) {
+                value = (deltaTime / 0.8);
+            }
+            
+            
+            if(sites[i].wolf.models.move == 1) {
+                
+                moveObjBy(&sites[i].wolf.models.objectArray[j], newV3(value * MOVEDISTANCE, 0, 0));
+                sites[i].wolf.models.distance -= value * MOVEDISTANCE;
+                
+                if(sites[i].wolf.models.distance < 0.f) {
+                    sites[i].wolf.models.distance = 0.f;
+                    sites[i].wolf.models.move = 2;
+                }
+            }
+            
+            else if(sites[i].wolf.models.move == 2) {
+                
+                moveObjBy(&sites[i].wolf.models.objectArray[j], newV3(-value * MOVEDISTANCE, 0, 0));
+                sites[i].wolf.models.distance += value * MOVEDISTANCE;
+                
+                if(sites[i].wolf.models.distance > MOVEDISTANCE) {
+                    sites[i].wolf.models.distance = MOVEDISTANCE;
+                    sites[i].wolf.models.move = 0;
+                    positionWolfModels(sites[i]);
+                }
+            }
+            
+            
             
             drawObject(&sites[i].prey.models.objectArray[j]);
             drawObject(&sites[i].wolf.models.objectArray[j]);

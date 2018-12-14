@@ -1,10 +1,19 @@
 #pragma once
 #include "text.h"
 
+typedef enum t_sp {
+    SLOW,
+    NORMAL,
+    FAST
+} SimulationSpeed;
+
 typedef struct t_mg {
     
-    float count;
+    int *animate;
+    int count;
     object *objectArray;
+    int move;
+    float distance;
     
 } ModelGroup;
 
@@ -46,8 +55,11 @@ Site *sites;
 siteObj *sitesArray;
 int sitesArrayCount;
 
+SimulationSpeed simulation_speed;
+
 void createInitialEnvironment(void);
 void drawSites(void);
 void freeSites(void);
 void timePasses(void);
 void createCSV(void);
+void printHistory(void);

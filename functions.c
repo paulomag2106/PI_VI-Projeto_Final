@@ -258,8 +258,8 @@ float points_distance(v3 pointA, v3 pointB) {
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 
-//    // int vertical = 0;
-//    // int horizontal = 0;
+    // int vertical = 0;
+    // int horizontal = 0;
 //    bool d = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
 //    bool w = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
 //    bool a = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;

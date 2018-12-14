@@ -6,6 +6,8 @@ int width, height, prevWidth, prevHeight;
 int objectsCount = 0;
 object *objectArray;
 
+float xPosCamera, yPosCamera;
+
 void loadSitesArray() {
     
     int size = sqrt(NUMPOINTS);
@@ -96,12 +98,17 @@ int main() {
 
     double timepassed = 0.f;
     bool isPaused = true;
-    double tickToPassTime = 1.f;
+    double tickToPassTime = 0.5f;
 
     width = WIDTH;
     height = HEIGHT;
     xAngle = -0.36f;
     yAngle = -0.8f;
+    
+    xPosCamera = 0.f;
+    yPosCamera = 0.f;
+    
+    simulation_speed = SLOW;
 
     // Initialize GLFW
     if(!glfwInit()) {
@@ -154,6 +161,8 @@ int main() {
     // Enable blend test
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    glEnable(GL_ALPHA);
 
     // Create and compile our GLSL program from the shaders
     programID = loadShaders("vertex.shader", "fragment.shader");
@@ -181,21 +190,8 @@ int main() {
     glfwSetCursorPosCallback(window, (void *)cursor_position_callback);
     glfwSetScrollCallback(window, (void *)scroll_callback);
 
-
-    // uint32_t twidth = TWIDTH;
-    // objtexture tex;
-    // tex.buffer = (uint32_t *) malloc(sizeof(uint32_t)*twidth*twidth);
-    // tex.width = twidth;
-    // tex.height = twidth;
-    // tex.bufferSize = twidth * twidth;
-
     genVoronoiMap(1);
-    // printSitePoints();
 
-    // Create Map
-//    object map = makeShapeObject(RECT, (v3){WIDTH/20, WIDTH/20, 0.f}, (v3){1.f,1.f,1.f}, NULL,
-//                                 GL_STATIC_DRAW, 0);
-//    updateTexture(&map, &tex);
 
     loadSitesArray();
     createInitialEnvironment();
@@ -218,14 +214,33 @@ int main() {
             isPaused = !isPaused;
         }
 
-        if(key_pressed[1]) {
-            key_pressed[1] = false;
-            tickToPassTime = clamp(tickToPassTime - 0.25f, 0.01f, 3.f);
-        }
-
         if(key_pressed[2]) {
             key_pressed[2] = false;
-            tickToPassTime = clamp(tickToPassTime + 0.25f, 0.01f, 3.f);
+            
+            if(simulation_speed == NORMAL)  {
+                simulation_speed = FAST;
+                tickToPassTime = 0.01f;
+            }
+            
+            else if(simulation_speed == SLOW) {
+                simulation_speed = NORMAL;
+                tickToPassTime = 0.5f;
+            }
+
+        }
+
+        if(key_pressed[1]) {
+            key_pressed[1] = false;
+            
+            if(simulation_speed == NORMAL)  {
+                simulation_speed = SLOW;
+                tickToPassTime = 1.f;
+            }
+            
+            else if(simulation_speed == FAST) {
+                simulation_speed = NORMAL;
+                tickToPassTime = 0.5f;
+            }
         }
 
         // Get deltaTime and FPS
@@ -249,7 +264,12 @@ int main() {
         v3 cameraPos = {0, 0, zoom};
         cameraPos = rotate(cameraPos, (v3){1,0,0}, xAngle+M_PI/2);
         cameraPos = rotate(cameraPos, (v3){0,0,1}, yAngle);
-        View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1}); // NOTE: camera is ALWAYS UPRIGHT!!!
+        
+        View = lookAt(cameraPos,(v3){0,0,0},(v3){0,0,1});
+        
+        
+        
+        // NOTE: camera is ALWAYS UPRIGHT!!!
 
         // printf("X:%f e Y:%f\n", xAngle, yAngle);
 
@@ -272,6 +292,7 @@ int main() {
     }
     
     //createCSV();
+    printHistory();
 
     glDeleteProgram(programID);
 
