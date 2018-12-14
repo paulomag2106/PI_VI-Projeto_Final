@@ -38,6 +38,10 @@ typedef struct t_site {
 } Site;
 
 
+Site *sites;
+siteObj *sitesArray;
+int sitesArrayCount;
+
 void createInitialEnvironment(void);
 void drawSites(void);
 void freeSites(void);

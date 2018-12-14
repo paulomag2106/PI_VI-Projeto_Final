@@ -6,23 +6,32 @@ int width, height, prevWidth, prevHeight;
 int objectsCount = 0;
 object *objectArray;
 
-void createTerrain() {
-
+void loadSitesArray() {
+    
     int size = sqrt(NUMPOINTS);
     int newSize = size - 2;
-
-    siteObj sitesArray[newSize * newSize];
+    
+    sitesArray = malloc(sizeof(siteObj) * newSize * newSize);
     objectArray = malloc(sizeof(object));
-
+    
+    sitesArrayCount = newSize * newSize;
+    
     for(int x = 1; x < (size-1); x++) {
-
+        
         for(int y = 1; y < (size-1); y++) {
-
+            
             sitesArray[(x-1) + ((y-1) * newSize)] = siteMeshes[x + (y * size)];
-
+            
         }
     }
+    
+}
 
+
+void createTerrain() {
+
+    int newSize = sqrt(sitesArrayCount);
+    
     for(int x = 0; x < newSize; x++) {
 
         for(int y = 0; y < newSize; y++) {
@@ -186,6 +195,7 @@ int main() {
 //                                 GL_STATIC_DRAW, 0);
 //    updateTexture(&map, &tex);
 
+    loadSitesArray();
     createInitialEnvironment();
     createTerrain();
 
@@ -269,9 +279,8 @@ int main() {
     for(int i = 0; i < NUMPOINTS; ++i) {
         free(siteMeshes[i].perimeter);
     }
-    // freeSites();
-
-    // Free textobjects
+    
+    freeSites();
 
     // Close window
     glfwTerminate();
