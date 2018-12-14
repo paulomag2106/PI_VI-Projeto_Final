@@ -38,9 +38,9 @@ void createTerrain() {
 
             siteObj site = sitesArray[x + (y * newSize)];
 
-            float red = randRange(0, 100) / 100.f;
-            float green = randRange(0, 100) / 100.f;
-            float blue = randRange(0, 100) / 100.f;
+//            float red = randRange(0, 100) / 100.f;
+//            float green = randRange(0, 100) / 100.f;
+//            float blue = randRange(0, 100) / 100.f;
 
             object newObject = createNewObject((v4){1.f, {1.f, 1.f, 1}}, NULL, GL_TRIANGLES, GL_STATIC_DRAW);
 
@@ -69,7 +69,9 @@ void createTerrain() {
                 b.x = c.x + b.x;
                 b.y = c.y + b.y;
 
-                makeNoisyTriangle(&newObject, a, b, c, 20, 30.f * accident);
+                int plusDivisions = accident * 10;
+                
+                makeNoisyTriangle(&newObject, a, b, c, 10 + plusDivisions, 30.f * accident);
 
             }
 
@@ -268,6 +270,8 @@ int main() {
         glfwPollEvents();
 
     }
+    
+    //createCSV();
 
     glDeleteProgram(programID);
 
