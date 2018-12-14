@@ -42,7 +42,7 @@ void createTerrain() {
             float green = randRange(0, 100) / 100.f;
             float blue = randRange(0, 100) / 100.f;
 
-            object newObject = createNewObject((v4){red, {green, blue, 1}}, NULL, GL_TRIANGLES, GL_STATIC_DRAW);
+            object newObject = createNewObject((v4){1.f, {1.f, 1.f, 1}}, NULL, GL_TRIANGLES, GL_STATIC_DRAW);
 
             float accident = site.center.z;
 

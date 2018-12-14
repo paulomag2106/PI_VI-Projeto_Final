@@ -28,6 +28,7 @@ typedef struct t_site {
     float x, y;
     float slopeAngle;
     float migrationRate;
+    float modelX, modelY;
     int nearest[8];
     int nextSite;
     Wolf wolf;

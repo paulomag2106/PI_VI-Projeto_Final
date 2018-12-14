@@ -2,13 +2,14 @@
 
 #define MODELCOUNT 10
 #define MODELSCALE 7.f
-#define MODELDIST_Y 5.f
-#define MODELDIST_X 3.f
+#define MODELDIST_Y 2.f
+#define MODELDIST_X 5.f
 #define MODEL_Z 1.f
-#define GROUPDIST 3.f
+#define GROUPDIST 5.f
 
 
-v4 standardColor = (v4) {1.f, (v3){1.f,1.f,1.f}};
+v4 wolfColor = (v4) {0.701f, (v3){0.701f, 0.701f, 1.f}};
+v4 preyColor = (v4) {0.494f, (v3){0.286f, 0.286f, 1.f}};
 
 
 void setNearest(int site_index) {
@@ -56,6 +57,18 @@ void createInitialEnvironment() {
         
         sites[i].slopeAngle = sitesArray[i].center.z;
         
+        float sumX = 0.f, sumY = 0.f;
+        
+        for(int p = 0; p < sitesArray[i].numPoints; p++) {
+            
+            sumX += (sitesArray[i].perimeter[p].x + sitesArray[i].center.x);
+            sumY += (sitesArray[i].perimeter[p].y + sitesArray[i].center.y);
+            
+        }
+        
+        sites[i].modelX = sumX / sitesArray[i].numPoints;
+        sites[i].modelY = sumY / sitesArray[i].numPoints;
+        
         float preyDensity = frand(1.f) * clamp(sites[i].slopeAngle, 0.4f, 0.6f);
         float wolfDensity = frand(1.f) * clamp((1.f - sites[i].slopeAngle), 0.3f, 0.8f);
         
@@ -67,18 +80,19 @@ void createInitialEnvironment() {
             object preyObj = loadOBJModel("models/grey_wolf.obj");
             object wolfObj = loadOBJModel("models/deer.obj");
             
-            preyObj.color = standardColor;
-            wolfObj.color = standardColor;
+            preyObj.color = preyColor;
+            wolfObj.color = wolfColor;
             
-            v3 preyPosition = newV3(sites[i].x, sites[i].y, MODEL_Z);
-            v3 wolfPosition = newV3(sites[i].x, sites[i].y, MODEL_Z);
+            v3 preyPosition = newV3(sites[i].modelX, sites[i].modelY, MODEL_Z);
+            v3 wolfPosition = newV3(sites[i].modelX, sites[i].modelY, MODEL_Z);
             
             wolfPosition.x -= (TWIDTH/2.f);
             wolfPosition.y -= (TWIDTH/2.f);
             preyPosition.x -= (TWIDTH/2.f);
             preyPosition.y -= (TWIDTH/2.f);
             
-            //preyPosition.x += GROUPDIST;
+            wolfPosition.x -= GROUPDIST;
+            preyPosition.x += GROUPDIST;
             
             float xChange = MODELDIST_X, yChange = MODELDIST_Y;
             
@@ -281,7 +295,7 @@ void timePasses() {
             float c = (float) x / 10.f;
 
             if(c >= preyDensity) {
-                sites[i].prey.models.objectArray[x].color = standardColor;
+                sites[i].prey.models.objectArray[x].color = preyColor;
             }
 
             else {
@@ -290,7 +304,7 @@ void timePasses() {
 
 
             if(c >= wolfDensity) {
-                sites[i].wolf.models.objectArray[x].color = standardColor;
+                sites[i].wolf.models.objectArray[x].color = wolfColor;
             }
 
             else {
