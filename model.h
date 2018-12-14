@@ -29,6 +29,10 @@ typedef struct t_site {
     float slopeAngle;
     float migrationRate;
     float modelX, modelY;
+    float *wolfHistory;
+    float *preyHistory;
+    int *huntSuccess;
+    int turnsPassed;
     int nearest[8];
     int nextSite;
     Wolf wolf;
@@ -46,4 +50,4 @@ void createInitialEnvironment(void);
 void drawSites(void);
 void freeSites(void);
 void timePasses(void);
-
+void createCSV(void);

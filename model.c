@@ -6,14 +6,56 @@
 #define MODELDIST_X 5.f
 #define MODEL_Z 1.f
 #define GROUPDIST 5.f
+#define TURNSTOTEST 200
 
 
 v4 wolfColor = (v4) {0.701f, (v3){0.701f, 0.701f, 1.f}};
 v4 preyColor = (v4) {0.494f, (v3){0.286f, 0.286f, 1.f}};
 
+void changeModels() {
+    
+    for(int i = 0; i < sitesArrayCount; i++) {
+        
+        float preyDensity = (sites[i].prey.preyDensity);
+        float wolfDensity = (sites[i].wolf.strength);
+        
+        if(preyDensity <= 0.0001f) preyDensity = 0.f;
+        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
+        
+        for(int x = 0; x < 10; x++) {
+            
+            float c = (float) x / 10.f;
+            
+            if(preyDensity >= c) {
+                sites[i].prey.models.objectArray[x].color = preyColor;
+            }
+            
+            else {
+                sites[i].prey.models.objectArray[x].color.vec.z = 0.f;
+            }
+            
+            
+            if(wolfDensity >= c) {
+                sites[i].wolf.models.objectArray[x].color = wolfColor;
+            }
+            
+            else {
+                sites[i].wolf.models.objectArray[x].color.vec.z = 0.f;
+            }
+            
+        }
+    }
+    
+}
+
 
 void setNearest(int site_index) {
     
+    //treis dados
+    //
+    // media sitio sucesso caca
+    // porcentagem de desnivel do terreno
+    // razão média entre as populations
     
     int value = sqrt(sitesArrayCount);
     int near_index = 0;
@@ -57,6 +99,14 @@ void createInitialEnvironment() {
         
         sites[i].slopeAngle = sitesArray[i].center.z;
         
+        //For CSV tests
+        //sites[i].slopeAngle = 0.5f;
+        
+        sites[i].turnsPassed = 0;
+        sites[i].wolfHistory = malloc(sizeof(float) * TURNSTOTEST);
+        sites[i].preyHistory = malloc(sizeof(float) * TURNSTOTEST);
+        sites[i].huntSuccess = malloc(sizeof(int) * TURNSTOTEST);
+        
         float sumX = 0.f, sumY = 0.f;
         
         for(int p = 0; p < sitesArray[i].numPoints; p++) {
@@ -71,6 +121,10 @@ void createInitialEnvironment() {
         
         float preyDensity = frand(1.f) * clamp(sites[i].slopeAngle, 0.4f, 0.6f);
         float wolfDensity = frand(1.f) * clamp((1.f - sites[i].slopeAngle), 0.3f, 0.8f);
+        
+        //For CSV tests
+        preyDensity = 0.5;
+        wolfDensity = 0.5;
         
         ModelGroup wolfGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
         ModelGroup preyGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
@@ -170,17 +224,30 @@ void createInitialEnvironment() {
         setNearest(i);
     }
 
+    changeModels();
 }
 
 
 void timePasses() {
 
     printf("time has passed!\n");
-
+    
     for(int i = 0; i < sitesArrayCount; i++) {
-
+        
         float w = sites[i].wolf.strength;
         float p = sites[i].prey.preyDensity;
+        
+        int turn = ++sites[i].turnsPassed;
+        
+        if(turn < TURNSTOTEST) {
+        
+            sites[i].preyHistory[turn] = p;
+            sites[i].wolfHistory[turn] = w;
+            sites[i].huntSuccess[turn] = -1;
+        
+        }
+        
+        
 
         float ratio;
 
@@ -243,6 +310,8 @@ void timePasses() {
 
                 sites[i].wolf.strength += huntWolfEffect;
                 sites[i].wolf.strength = clamp(sites[i].wolf.strength, 0.f, 1.f);
+                
+                if(turn < TURNSTOTEST) sites[i].huntSuccess[turn] = 1;
 
             }
 
@@ -255,6 +324,8 @@ void timePasses() {
 
                 sites[i].wolf.strength -= noHuntEffect;
                 sites[i].wolf.strength = clamp(sites[i].wolf.strength, 0.f, 1.f);
+                
+                if(turn < TURNSTOTEST) sites[i].huntSuccess[turn] = 0;
 
             }
         }
@@ -282,39 +353,30 @@ void timePasses() {
         }
     }
 
-    for(int i = 0; i < sitesArrayCount; i++) {
-
-        float preyDensity = (sites[i].prey.preyDensity);
-        float wolfDensity = (sites[i].wolf.strength);
-
-        if(preyDensity <= 0.0001f) preyDensity = 0.f;
-        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
-
-        for(int x = 0; x < 10; x++) {
-
-            float c = (float) x / 10.f;
-
-            if(c >= preyDensity) {
-                sites[i].prey.models.objectArray[x].color = preyColor;
-            }
-
-            else {
-                sites[i].prey.models.objectArray[x].color.vec.z = 0.f;
-            }
-
-
-            if(c >= wolfDensity) {
-                sites[i].wolf.models.objectArray[x].color = wolfColor;
-            }
-
-            else {
-                sites[i].wolf.models.objectArray[x].color.vec.z = 0.f;
-            }
-
-        }
-    }
+    changeModels();
 }
 
+void createCSV() {
+    
+    FILE *file = fopen("results-pop.csv", "w");
+    
+    for(int s = 0; s < sitesArrayCount; s++) {
+        
+        Site site = sites[s];
+        
+        fprintf(file, "Sitio %d\n", s);
+        
+        for(int t = 0; t < TURNSTOTEST; t++) {
+            
+            fprintf(file, "%f, %f, %d\n", site.wolfHistory[t], site.preyHistory[t], site.huntSuccess[t]);
+        }
+        
+        fprintf(file, "\n");
+    }
+    
+    fclose(file);
+    
+}
 
 void drawSites() {
 
@@ -332,6 +394,11 @@ void drawSites() {
 void freeSites() {
 
     for(int i = 0; i < sitesArrayCount; i++) {
+        
+        free(sites[i].huntSuccess);
+        free(sites[i].wolfHistory);
+        free(sites[i].preyHistory);
+        
         for(int j = 0; j < MODELCOUNT; j++) {
             
             freeObject(&sites[i].prey.models.objectArray[j]);

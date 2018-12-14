@@ -2,7 +2,7 @@
 #include "functions.h"
 #define TWIDTH (1024/2)
 
-#define RADIUS (512/8)
+#define RADIUS (256/8)
 // #define VORONOIPOINTS RADIUS*16
 
 #define NUMPOINTS (TWIDTH/RADIUS * TWIDTH/RADIUS)
