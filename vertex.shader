@@ -10,13 +10,13 @@ layout(location = 2) in vec2 uvs;
 uniform vec3 pos;
 uniform vec3 scale;
 uniform vec4 rotation;
-uniform vec3 color;
+uniform vec4 color;
 
 uniform mat4 Projection;
 uniform mat4 View;
 
 out vec2 UV;
-out vec3 fragmentColor;
+out vec4 fragmentColor;
 void main() {
 
 	// Simulate "lighting" based on camera position
@@ -25,7 +25,8 @@ void main() {
 
 	vec3 modelTransform = scale * vertexPosition_modelspace + pos;
 	gl_Position = Projection * View * vec4(modelTransform,1);
-    fragmentColor = color * vec3((vertexPosition_modelspace.z+20)/40,1-(vertexPosition_modelspace.z+20)/40,1) * cosTheta;
+    fragmentColor.rgb = color.rgb * vec3((vertexPosition_modelspace.z+20)/40,1-(vertexPosition_modelspace.z+20)/40,1) * cosTheta;
+	fragmentColor.a = color.a;
 	UV = uvs;
 
 }

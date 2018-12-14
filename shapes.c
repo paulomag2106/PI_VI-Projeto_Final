@@ -685,7 +685,7 @@ void makeTriangle(object *obj, v3 pointA, v3 pointB, v3 pointC, int subdivision)
 }
 
 
-object makeShapeObject(objEnum type, v3 radius, v3 color, objtexture *texture, GLenum usage, int subdivision) {
+object makeShapeObject(objEnum type, v3 radius, v4 color, objtexture *texture, GLenum usage, int subdivision) {
 
 
     subdivision = clamp(subdivision, 0, 10);
