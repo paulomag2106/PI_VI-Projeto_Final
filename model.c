@@ -1,5 +1,10 @@
 #include "model.h"
 
+#define MODELSCALE 13.2f
+#define MODELDIST 20.f
+#define MODEL_Z 5.f
+#define GROUPDIST 50.f
+
 Site sites[NUMPOINTS];
 
 void setNearest(int site_index) {
@@ -50,21 +55,75 @@ void createInitialEnvironment() {
 
         float preyDensity = frand(1.f) * clamp(sites[i].slopeAngle, 0.4f, 0.6f);
         float wolfDensity = frand(1.f) * clamp((1.f - sites[i].slopeAngle), 0.3f, 0.8f);
-
-        object preyObj = loadOBJModel("models/grey_wolf.obj");
-        object wolfObj = loadOBJModel("models/deer.obj");
         
-//        object preyObj = makeShapeObject(TRIANGLE, newV3(1, 1, 0), newV3(0, 0, 1), NULL, GL_DYNAMIC_DRAW, 0);
-//        object wolfObj = makeShapeObject(ELLIPSOID_2D, newV3(1, 1, 0), newV3(1, 0, 0), NULL, GL_DYNAMIC_DRAW, 2);
-
-        preyObj.position = newV3(sites[i].x + 1.f, sites[i].y, 5.1f);
-        wolfObj.position = newV3(sites[i].x - 1.f, sites[i].y, 5.11f);
-
-        scaleObjTo(&preyObj, newV3(18.2f*preyDensity, 18.2f*preyDensity, 18.2f*preyDensity));
-        scaleObjTo(&wolfObj, newV3(12.2f*wolfDensity, 12.2f*wolfDensity, 12.2f*wolfDensity));
-
-        sites[i].prey = (Prey){preyObj, preyDensity};
-        sites[i].wolf = (Wolf){wolfObj, wolfDensity};
+        ModelGroup wolfGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
+        ModelGroup preyGroup = {MODELCOUNT, malloc(sizeof(object) * MODELCOUNT)};
+        
+        for(int m = 0; m < MODELCOUNT; m++) {
+            
+            object preyObj = loadOBJModel("models/grey_wolf.obj");
+            object wolfObj = loadOBJModel("models/deer.obj");
+            
+            preyObj.color = newV3(1, 1, 1);
+            wolfObj.color = newV3(1, 1, 1);
+            
+            wolfGroup.objectArray[m] = wolfObj;
+            preyGroup.objectArray[m] = preyObj;
+            
+            v3 preyPosition = newV3(sites[i].x + GROUPDIST, sites[i].y, MODEL_Z);
+            v3 wolfPosition = newV3(sites[i].x - GROUPDIST, sites[i].y, MODEL_Z);
+            
+            float xChange = MODELDIST, yChange = MODELDIST;
+            
+            switch (m) {
+                case 0:
+                    xChange = 0.f;
+                    yChange = 0.f;
+                case 1:
+                    xChange = MODELDIST;
+                    yChange = -MODELDIST;
+                case 2:
+                    xChange = MODELDIST;
+                    yChange = MODELDIST;
+                case 3:
+                    xChange = -MODELDIST;
+                    yChange = -MODELDIST;
+                case 4:
+                    xChange = -MODELDIST;
+                    yChange = MODELDIST;
+                case 6:
+                    xChange = 0.f;
+                    yChange = MODELDIST * 2.f;
+                case 7:
+                    xChange = 0.f;
+                    yChange = MODELDIST * -2.f;
+                case 8:
+                    xChange = MODELDIST * 2.f;
+                    yChange = 0.f;
+                case 9:
+                    xChange = MODELDIST * -2.f;
+                    yChange = 0.f;
+            }
+            
+            wolfPosition.x += xChange;
+            wolfPosition.y += yChange;
+            
+            preyPosition.x += -xChange;
+            preyPosition.y += yChange;
+            
+            preyObj.position = preyPosition;
+            wolfObj.position = wolfPosition;
+            
+            scaleObjTo(&preyObj, newV3(MODELSCALE*preyDensity, MODELSCALE*preyDensity, MODELSCALE*preyDensity));
+            scaleObjTo(&wolfObj, newV3(MODELSCALE*wolfDensity, MODELSCALE*wolfDensity, MODELSCALE*wolfDensity));
+            
+            rotateObjBy(&preyObj, newV3(0, 0, 1), M_PI / 2.f);
+            rotateObjBy(&wolfObj, newV3(0, 0, 1), -M_PI / 2.f);
+        }
+        
+        
+        sites[i].prey = (Prey){preyGroup, preyDensity};
+        sites[i].wolf = (Wolf){wolfGroup, wolfDensity};
 
         sites[i].nextSite = -1;
 

@@ -1,17 +1,24 @@
 #pragma once
 #include "text.h"
+#define MODELCOUNT 10
 
+typedef struct t_mg {
+    
+    float count;
+    object *objectArray;
+    
+} ModelGroup;
 
 typedef struct t_wolf {
     
-    object obj;
+    ModelGroup models;
     float strength;
     
 } Wolf;
 
 typedef struct t_prey {
     
-    object obj;
+    ModelGroup models;
     float preyDensity;
     
 } Prey;
