@@ -151,7 +151,8 @@ int main() {
 
     // Create and compile our GLSL program from the shaders
     programID = loadShaders("vertex.shader", "fragment.shader");
-    // programID2 = loadShaders("vertex.shader", "fragment.shader");
+    // GLuint programID2;
+    // programID2 = loadShaders("vertex2.shader", "fragment.shader");
     glUseProgram(programID);
 
     // Perspective Projection matrix
