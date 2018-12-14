@@ -42,7 +42,7 @@ void createTerrain() {
             float green = randRange(0, 100) / 100.f;
             float blue = randRange(0, 100) / 100.f;
 
-            object newObject = createNewObject((v4){red, {green, blue, 1}}, NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
+            object newObject = createNewObject((v4){red, {green, blue, 1}}, NULL, GL_TRIANGLES, GL_STATIC_DRAW);
 
             float accident = site.center.z;
 
@@ -69,7 +69,7 @@ void createTerrain() {
                 b.x = c.x + b.x;
                 b.y = c.y + b.y;
 
-                makeNoisyTriangle(&newObject, a, b, c, 40, 30.f * accident);
+                makeNoisyTriangle(&newObject, a, b, c, 20, 30.f * accident);
 
             }
 

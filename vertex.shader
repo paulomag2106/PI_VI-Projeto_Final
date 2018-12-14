@@ -25,7 +25,12 @@ void main() {
 
 	vec3 modelTransform = scale * vertexPosition_modelspace + pos;
 	gl_Position = Projection * View * vec4(modelTransform,1);
-    fragmentColor.rgb = color.rgb * vec3((vertexPosition_modelspace.z+20)/40,1-(vertexPosition_modelspace.z+20)/40,1) * cosTheta;
+	// green 0.215, 0.466, 0.262
+	// brown 0.466, 0.286, 0.215
+	vec3 grass = vec3(0.215, 0.466, 0.262);
+	vec3 dirt = vec3(0.466, 0.286, 0.215);
+	vec3 levelColor = mix(grass, dirt, vertexPosition_modelspace.z);
+    fragmentColor.rgb = color.rgb * levelColor * cosTheta;
 	fragmentColor.a = color.a;
 	UV = uvs;
 
