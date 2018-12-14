@@ -28,6 +28,15 @@ void createTerrain() {
         for(int y = 0; y < newSize; y++) {
 
             siteObj site = sitesArray[x + (y * newSize)];
+            
+            float red = randRange(0, 100) / 100.f;
+            float green = randRange(0, 100) / 100.f;
+            float blue = randRange(0, 100) / 100.f;
+            
+            object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
+            
+            float accident = site.center.z;
+            
 
             for(int p = 0; p < site.numPoints; p++) {
 
@@ -51,28 +60,14 @@ void createTerrain() {
                 b.x = c.x + b.x;
                 b.y = c.y + b.y;
 
-                float red = randRange(0, 100) / 100.f;
-                float green = randRange(0, 100) / 100.f;
-                float blue = randRange(0, 100) / 100.f;
-
-                object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
-
-                float accident = frand(1.f);
-
                 makeNoisyTriangle(&newObject, a, b, c, 40, 30.f * accident);
-
-                makeVBOSizeAndPush(&newObject);
-
-                //v3 position = newV3(c.x - (TWIDTH/2.f), c.y - (TWIDTH/2.f), 0.f);
-
-                //moveObjTo(&newObject, position);
-
-                objectArray = realloc(objectArray, objectsCount * sizeof(object));
-                objectArray[objectsCount-1] = newObject;
-
-
-
+                
             }
+            
+            makeVBOSizeAndPush(&newObject);
+            
+            objectArray = realloc(objectArray, objectsCount * sizeof(object));
+            objectArray[objectsCount-1] = newObject;
 
         }
     }
@@ -256,8 +251,8 @@ int main() {
         for(int i = 0; i < objectsCount; i++) {
             drawObject(&objectArray[i]);
         }
-
-        //drawSites();
+        
+        drawSites();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
