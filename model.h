@@ -1,6 +1,5 @@
 #pragma once
 #include "text.h"
-#define MODELCOUNT 10
 
 typedef struct t_mg {
     

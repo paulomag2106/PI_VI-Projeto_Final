@@ -1,13 +1,14 @@
 #include "model.h"
 
+#define MODELCOUNT 10
 #define MODELSCALE 7.f
-#define MODELDIST_Y 3.f
-#define MODELDIST_X 1.f
-#define MODEL_Z 5.f
-#define GROUPDIST 2.f
+#define MODELDIST_Y 5.f
+#define MODELDIST_X 3.f
+#define MODEL_Z 1.f
+#define GROUPDIST 3.f
 
 
-v4 standardColor = (v4) {1.f,1.f,1.f,1.f};
+v4 standardColor = (v4) {1.f, (v3){1.f,1.f,1.f}};
 
 
 void setNearest(int site_index) {
@@ -69,8 +70,15 @@ void createInitialEnvironment() {
             preyObj.color = standardColor;
             wolfObj.color = standardColor;
             
-            v3 preyPosition = newV3(sites[i].x + GROUPDIST, sites[i].y, MODEL_Z);
-            v3 wolfPosition = newV3(sites[i].x - GROUPDIST, sites[i].y, MODEL_Z);
+            v3 preyPosition = newV3(sites[i].x, sites[i].y, MODEL_Z);
+            v3 wolfPosition = newV3(sites[i].x, sites[i].y, MODEL_Z);
+            
+            wolfPosition.x -= (TWIDTH/2.f);
+            wolfPosition.y -= (TWIDTH/2.f);
+            preyPosition.x -= (TWIDTH/2.f);
+            preyPosition.y -= (TWIDTH/2.f);
+            
+            //preyPosition.x += GROUPDIST;
             
             float xChange = MODELDIST_X, yChange = MODELDIST_Y;
             
@@ -78,56 +86,59 @@ void createInitialEnvironment() {
                 case 0:
                     xChange = 0.f;
                     yChange = 0.f;
+                    break;
                 case 1:
                     xChange = -MODELDIST_X;
                     yChange = MODELDIST_Y;
+                    break;
                 case 2:
                     xChange = -MODELDIST_X;
                     yChange = -MODELDIST_Y;
+                    break;
                 case 3:
                     xChange = -2.f * MODELDIST_X;
                     yChange = 0.f;
+                    break;
                 case 4:
                     xChange = -2.f * MODELDIST_X;
                     yChange = 2.f * MODELDIST_Y;
+                    break;
                 case 5:
                     xChange = -2.f * MODELDIST_X;
                     yChange = -2.f * MODELDIST_Y;
+                    break;
                 case 6:
                     xChange = -3.f * MODELDIST_X;
                     yChange = MODELDIST_Y;
+                    break;
                 case 7:
                     xChange = -3.f * MODELDIST_X;
                     yChange = -MODELDIST_Y;
+                    break;
                 case 8:
                     xChange = -4.f * MODELDIST_X;
                     yChange = MODELDIST_Y;
+                    break;
                 case 9:
                     xChange = -4.f * MODELDIST_X;
                     yChange = -MODELDIST_Y;
+                    break;
             }
             
             wolfPosition.x += xChange;
             wolfPosition.y += yChange;
-            
+
             preyPosition.x += -xChange;
             preyPosition.y += yChange;
-            
-            wolfPosition.x -= (TWIDTH/2.f);
-            wolfPosition.y -= (TWIDTH/2.f);
-            
-            preyPosition.x -= (TWIDTH/2.f);
-            preyPosition.y -= (TWIDTH/2.f);
-            
-            
+        
             preyObj.position = preyPosition;
             wolfObj.position = wolfPosition;
             
             scaleObjTo(&preyObj, newV3(MODELSCALE, MODELSCALE, MODELSCALE));
             scaleObjTo(&wolfObj, newV3(MODELSCALE, MODELSCALE, MODELSCALE));
             
-            rotateObjBy(&preyObj, newV3(0, 0, 1), M_PI / 2.f);
-            rotateObjBy(&wolfObj, newV3(0, 0, 1), -M_PI / 2.f);
+//            rotateObjBy(&preyObj, newV3(0, 0, 1), M_PI / 2.f);
+//            rotateObjBy(&wolfObj, newV3(0, 0, 1), -M_PI / 2.f);
             
             wolfGroup.objectArray[m] = wolfObj;
             preyGroup.objectArray[m] = preyObj;
@@ -262,30 +273,30 @@ void timePasses() {
         float preyDensity = (sites[i].prey.preyDensity);
         float wolfDensity = (sites[i].wolf.strength);
 
-//        if(preyDensity <= 0.0001f) preyDensity = 0.f;
-//        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
+        if(preyDensity <= 0.0001f) preyDensity = 0.f;
+        if(wolfDensity <= 0.0001f) wolfDensity = 0.f;
 
         for(int x = 0; x < 10; x++) {
-            
+
             float c = (float) x / 10.f;
-            
+
             if(c >= preyDensity) {
                 sites[i].prey.models.objectArray[x].color = standardColor;
             }
-            
+
             else {
-                sites[i].prey.models.objectArray[x].color.w = 0.f;
+                sites[i].prey.models.objectArray[x].color.vec.z = 0.f;
             }
-            
-            
+
+
             if(c >= wolfDensity) {
                 sites[i].wolf.models.objectArray[x].color = standardColor;
             }
-            
+
             else {
-                sites[i].wolf.models.objectArray[x].color.w = 0.f;
+                sites[i].wolf.models.objectArray[x].color.vec.z = 0.f;
             }
-            
+
         }
     }
 }
