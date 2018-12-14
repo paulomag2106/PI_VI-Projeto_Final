@@ -28,15 +28,15 @@ void createTerrain() {
         for(int y = 0; y < newSize; y++) {
 
             siteObj site = sitesArray[x + (y * newSize)];
-            
+
             float red = randRange(0, 100) / 100.f;
             float green = randRange(0, 100) / 100.f;
             float blue = randRange(0, 100) / 100.f;
-            
-            object newObject = createNewObject(newV3(red, green, blue), NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
-            
+
+            object newObject = createNewObject((v4){red, {green, blue, 1}}, NULL, GL_TRIANGLES, GL_DYNAMIC_DRAW);
+
             float accident = site.center.z;
-            
+
 
             for(int p = 0; p < site.numPoints; p++) {
 
@@ -61,11 +61,11 @@ void createTerrain() {
                 b.y = c.y + b.y;
 
                 makeNoisyTriangle(&newObject, a, b, c, 40, 30.f * accident);
-                
+
             }
-            
+
             makeVBOSizeAndPush(&newObject);
-            
+
             objectArray = realloc(objectArray, objectsCount * sizeof(object));
             objectArray[objectsCount-1] = newObject;
 
@@ -251,7 +251,7 @@ int main() {
         for(int i = 0; i < objectsCount; i++) {
             drawObject(&objectArray[i]);
         }
-        
+
         drawSites();
 
         glfwSwapBuffers(window);

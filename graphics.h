@@ -61,7 +61,7 @@ typedef struct t_object {
             *uvs;
     v3 position, scale;
     v4 rotation; // quaternion
-    v3 color;
+    v4 color;
 
     int verticesCount;
     objtexture *tex;
@@ -77,7 +77,7 @@ void freeObject(object *toFree);
 void updateTexture(object *newObject, objtexture *tex);
 
 // Objects
-object createNewObject(v3 color, objtexture *texture, GLenum drawMode, GLenum usage);
+object createNewObject(v4 color, objtexture *texture, GLenum drawMode, GLenum usage);
 object loadOBJModel(const char *file_name);
 
 // Manipulate Objects

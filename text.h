@@ -23,11 +23,11 @@ float character_height;
 float uvWidth;
 
 typedef struct t_txtobj {
-    
+
     char *text;
     int textCount;
     object obj;
-    
+
 } textobject;
 
 typedef enum t_spacement {
@@ -43,7 +43,6 @@ typedef enum t_alignment {
     TEXT_JUSTIFIED
 } TextAlignment;
 
-textobject makeTextObject(const char *text, float textWidth, int fontSize, TextSpacement spacement, TextAlignment alignment, v3 textColor);
+textobject makeTextObject(const char *text, float textWidth, int fontSize, TextSpacement spacement, TextAlignment alignment, v4 textColor);
 void freeFont(void);
 void freeTextObject(textobject *obj);
-
